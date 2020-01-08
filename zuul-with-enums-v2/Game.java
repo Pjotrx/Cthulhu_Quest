@@ -15,20 +15,182 @@
  * @version 2016.02.29
  */
 
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class Game 
 {
     private Parser parser;
     private Room currentRoom;
-        
+    private boolean parse = false;
+    
+    JFrame window;
+    Container con;
+    JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
+    JLabel titleLabel;
+    Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
+    Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
+    Font smallFont = new Font("Times New Roman", Font.PLAIN, 12);
+    JButton startButton, option1, option2, language1, language2, confirmInputButton;
+    JTextArea mainTextArea;
+    JTextField userInput;
+    Locale deutsch = new Locale("ge", "GE");
+    Locale nederlands = new Locale("nl", "NL");
+    Locale english = new Locale("en", "EN");
+    ResourceBundle r = ResourceBundle.getBundle("Bundle", english);
+    String getValue;
+    TitleScreenHandler tsHandler = new TitleScreenHandler();
+    
     /**
      * Create the game and initialise its internal map.
      */
     public Game() 
     {
+        createStartScreen();
         createRooms();
         parser = new Parser();
     }
-
+    
+    /**
+     * Create a window with the start button etc
+     */
+    public void createStartScreen(){
+        window = new JFrame();
+        window.setSize(800, 600);
+        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly
+        window.getContentPane().setBackground(Color.black);
+        window.setLayout(null); //set default layout to null
+        
+        con = window.getContentPane();
+        
+        titlePanel = new JPanel();
+        titlePanel.setBounds(100, 100, 600, 150);       // (xpos, ypos, width, height)
+        titlePanel.setBackground(Color.black);
+        
+        titleLabel = new JLabel("C̶͉͉͆̈ẗ̶͓̤̓̐̚͝ẖ̴̀͝u̴͌̆̄ͅl̵̢̡̒h̷̢̛̛͔̀̈́͠ǘ̷̢̨͚͍́̈͊̆ ̷̬̓͗́̇Q̴̗̰̖͈̟͊͝û̷͔̝̗̫͗͝͝è̵̺s̶̰͒̀̔ṭ̴̡̞̝͊");
+        titleLabel.setForeground(Color.white);
+        titleLabel.setFont(titleFont);
+        
+        startButtonPanel = new JPanel();
+        startButtonPanel.setBounds(300, 400, 200, 100);
+        startButtonPanel.setBackground(Color.black);
+        
+        startButton = new JButton("START");
+        startButton.setBackground(Color.black);
+        startButton.setForeground(Color.white);
+        startButton.setFont(normalFont);
+        startButton.addActionListener(tsHandler);
+        
+        
+        //needs to be added to optionScreen
+        //==============================
+        languagePanel = new JPanel();
+        languagePanel.setBounds(20, 20, 200, 50);
+        languagePanel.setBackground(Color.black);
+        languagePanel.setLayout(new GridLayout(1, 4));
+        con.add(languagePanel);
+        
+        language1 = new JButton("En");
+        language1.setBackground(Color.black);
+        language1.setForeground(Color.white);
+        language1.setFont(normalFont);
+        languagePanel.add(language1);
+        
+        language2 = new JButton("De");
+        language2.setBackground(Color.black);
+        language2.setForeground(Color.white);
+        language2.setFont(normalFont);
+        language2.addActionListener(tsHandler);
+        languagePanel.add(language2);
+        //==============================
+        
+        titlePanel.add(titleLabel);
+        startButtonPanel.add(startButton);
+        con.add(titlePanel);
+        con.add(startButtonPanel);
+        window.setVisible(true);
+    }
+    /**
+     * Creates a screen to display settings.
+     * Not finished or even functional
+     */
+    public void creatOptionScreen(){
+        optionPanel = new JPanel();
+        optionPanel.setBounds(250, 350, 300, 50);
+        optionPanel.setBackground(Color.black);
+        optionPanel.setLayout(new GridLayout(4, 1));
+        
+        
+        option1 = new JButton("Option 1");
+        option1.setBackground(Color.black);
+        option1.setForeground(Color.white);
+        option1.setFont(normalFont);
+        optionPanel.add(option1);
+        
+        option2 = new JButton("Option 2");
+        option2.setBackground(Color.black);
+        option2.setForeground(Color.white);
+        option2.setFont(normalFont);
+        optionPanel.add(option2);
+        
+        con.add(optionPanel);
+    }
+    
+    /**
+     * Creates a main JTextArea to display descriptions and instructions.
+     * As well as an JTextField and submit button for user input.
+     */
+    public void createGameScreen() 
+    {
+        titlePanel.setVisible(false);
+        languagePanel.setVisible(false);
+        startButtonPanel.setVisible(false);
+        
+        mainText = new JPanel();
+        mainText.setBounds(100, 100, 600, 250);
+        mainText.setBackground(Color.black);
+        con.add(mainText);
+        
+        mainTextArea = new JTextArea("this is the main text Area");
+        mainTextArea.setBounds(100, 100, 600, 250);
+        mainTextArea.setBackground(Color.black);
+        mainTextArea.setForeground(Color.white);
+        mainTextArea.setEditable(false);
+        mainTextArea.setFont(normalFont);
+        mainTextArea.setLineWrap(true);
+        
+        mainText.add(mainTextArea);
+        
+        inputPanel = new JPanel();
+        inputPanel.setBounds(250, 350, 300, 50);
+        inputPanel.setBackground(Color.black);
+        inputPanel.setLayout(new GridLayout(2, 1));
+        con.add(inputPanel);
+       
+        userInput = new JTextField("");
+        confirmInputButton = new JButton("confirm");
+        confirmInputButton.setBounds(550, 350, 50, 50);
+        confirmInputButton.addActionListener(tsHandler);
+        inputPanel.add(userInput);
+        con.add(confirmInputButton);
+        
+        window.getRootPane().setDefaultButton(confirmInputButton);
+    }
+    
     /**
      * Create all the rooms and link their exits together.
      */
@@ -37,32 +199,39 @@ public class Game
         Room outside, theater, pub, lab, office;
       
         // create the rooms
-        outside = new Room("outside the main entrance of the university");
-        theater = new Room("in a lecture theater");
-        pub = new Room("in the campus pub");
-        lab = new Room("in a computing lab");
-        office = new Room("in the computing admin office");
+        outside = new Room(r.getString("outside"));
+        theater = new Room(r.getString("theater"));
+        pub = new Room(r.getString("pub"));
+        lab = new Room(r.getString("lab"));
+        office = new Room(r.getString("office"));
         
         // initialise room exits
-        outside.setExit("east", theater);
-        outside.setExit("south", lab);
-        outside.setExit("west", pub);
+        outside.setExit(r.getString("east"), theater);
+        outside.setExit(r.getString("south"), lab);
+        outside.setExit(r.getString("west"), pub);
 
-        theater.setExit("west", outside);
+        theater.setExit(r.getString("west"), outside);
 
-        pub.setExit("east", outside);
+        pub.setExit(r.getString("east"), outside);
 
-        lab.setExit("north", outside);
-        lab.setExit("east", office);
+        lab.setExit(r.getString("north"), outside);
+        lab.setExit(r.getString("east"), office);
 
-        office.setExit("west", lab);
+        office.setExit(r.getString("west"), lab);
 
         currentRoom = outside;  // start game outside
     }
 
     /**
-     *  Main play routine.  Loops until end of play.
+     *  Main play routine.
+     *  Instead of a loop event triggers are used.
      */
+    public void play() 
+    {           
+        createGameScreen();
+        printWelcome();
+    }
+    /*
     public void play() 
     {            
         printWelcome();
@@ -76,19 +245,14 @@ public class Game
             finished = processCommand(command);
         }
         System.out.println("Thank you for playing.  Good bye.");
-    }
+    }*/
 
     /**
      * Print out the opening message for the player.
      */
-    private void printWelcome()
-    {
-        System.out.println();
-        System.out.println("Welcome to the World of Zuul!");
-        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
-        System.out.println("Type '" + CommandWord.HELP + "' if you need help.");
-        System.out.println();
-        System.out.println(currentRoom.getLongDescription());
+    public void printWelcome()
+    {   
+        mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
     }
 
     /**
@@ -104,7 +268,7 @@ public class Game
 
         switch (commandWord) {
             case UNKNOWN:
-                System.out.println("I don't know what you mean...");
+                mainTextArea.setText(r.getString("unknown"));
                 break;
 
             case HELP:
@@ -131,11 +295,7 @@ public class Game
      */
     private void printHelp() 
     {
-        System.out.println("You are lost. You are alone. You wander");
-        System.out.println("around at the university.");
-        System.out.println();
-        System.out.println("Your command words are:");
-        parser.showCommands();
+        mainTextArea.setText(r.getString("helpText") + parser.showCommands());
     }
 
     /** 
@@ -146,7 +306,7 @@ public class Game
     {
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
-            System.out.println("Go where?");
+            mainTextArea.setText(r.getString("goWhere"));
             return;
         }
 
@@ -156,14 +316,16 @@ public class Game
         Room nextRoom = currentRoom.getExit(direction);
 
         if (nextRoom == null) {
-            System.out.println("There is no door!");
+            mainTextArea.append("\n" + r.getString("noDoor"));
         }
         else {
             currentRoom = nextRoom;
-            System.out.println(currentRoom.getLongDescription());
+            mainTextArea.setText(currentRoom.getLongDescription());
         }
     }
-
+    
+  
+    
     /** 
      * "Quit" was entered. Check the rest of the command to see
      * whether we really quit the game.
@@ -172,11 +334,47 @@ public class Game
     private boolean quit(Command command) 
     {
         if(command.hasSecondWord()) {
-            System.out.println("Quit what?");
+            mainTextArea.setText(r.getString("quitWhat"));
             return false;
         }
         else {
+            mainTextArea.setText("Just press the X");
             return true;  // signal that we want to quit
         }
     }
+    
+  
+    
+    public class TitleScreenHandler implements ActionListener
+    {
+        public void actionPerformed(ActionEvent event)
+        {
+            if(startButton.equals(event.getSource())){
+              play();
+            }
+            else if (language1.equals(event.getSource())){
+                r = ResourceBundle.getBundle("Bundle", english);
+            }
+            else if (language2.equals(event.getSource())){
+                r = ResourceBundle.getBundle("Bundle", deutsch);
+                createRooms();
+            }
+            else if (confirmInputButton.equals(event.getSource())){
+                getValue = userInput.getText();
+                System.out.println(getValue);   //just for debugging
+                userInput.setText("");
+                
+                boolean finished = false;                 
+                Command command = parser.getCommand(getValue);
+                finished = processCommand(command);                
+            }
+            
+            
+        }
+    }
+        
+      
 }
+
+
+    
