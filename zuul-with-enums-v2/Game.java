@@ -32,11 +32,14 @@ import javax.swing.JTextField;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import java.util.ArrayList;
+
 public class Game 
 {
     private Parser parser;
     private Room currentRoom;
     private boolean parse = false;
+    private ArrayList<Item> inventaris;
     
     JFrame window;
     Container con;
@@ -57,6 +60,7 @@ public class Game
     
     /**
      * Create the game and initialise its internal map.
+     * As well as the items and the inventory.
      */
     public Game() 
     {
@@ -126,6 +130,7 @@ public class Game
         con.add(startButtonPanel);
         window.setVisible(true);
     }
+    
     /**
      * Creates a screen to display settings.
      * Not finished or even functional
@@ -222,18 +227,22 @@ public class Game
         office.setExit(r.getString("west"), lab);
 
         currentRoom = outside;  // start game outside
-    }
+    }    
     
     private void createItems(){
         Item dragonKey;
         
-        dragonKey = new Item("A key that is somewhat shaped like a dragon.");
+        dragonKey = new Item("A key somewhat shaped like a dragon.");
     }
     
     private void createInventory(){
-        Inventory inventaris;
+        ArrayList inventaris = new ArrayList<>();
     }
-
+    
+    private void addToInventory(Item itemToAdd){
+        inventaris.add(itemToAdd);
+    }
+    
     /**
      *  Main play routine.
      *  Instead of a loop event triggers are used.
@@ -294,12 +303,23 @@ public class Game
             case QUIT:
                 wantToQuit = quit(command);
                 break;
+                
+            case INVENTORY:
+                printInventory();
+                break;
         }
         return wantToQuit;
     }
 
-    // implementations of user commands:
-
+    // implementations of user commands:  
+    
+    /**
+     * Here we list the entire inventory worth of stuff.
+     */
+    private void printInventory(){
+        //Gelieve hier een oplossing te vinden alvorens verder te gaan.
+    }
+    
     /**
      * Print out some help information.
      * Here we print some stupid, cryptic message and a list of the 
@@ -355,7 +375,7 @@ public class Game
         }
     }
     
-  
+    
     
     public class TitleScreenHandler implements ActionListener
     {

@@ -7,7 +7,6 @@
  */
 public class Item
 {
-    // instance variables - vervang deze door jouw variabelen
     private String description;
 
     /**
