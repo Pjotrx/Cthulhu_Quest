@@ -1,0 +1,10 @@
+#BlueJ class context
+comment0.target=Inventory
+comment0.text=\r\n\ class\ Inventory\ -\ This\ class\ will\ keep\ track\ of\ the\ current\ inventory\ of\ the\ player\r\n\r\n\ @author\ Sjoerd\ Jr\ Helmhout\r\n\ @version\ 0.1\r\n
+comment1.params=
+comment1.target=Inventory()
+comment1.text=\r\n\ Constructor\ voor\ objects\ van\ class\ Inventory\r\n
+comment2.params=
+comment2.target=void\ voorbeeldMethod()
+comment2.text=\r\n\ Voorbeeld\ van\ een\ method\ -\ schrijf\ hier\ jouw\ comments\r\n
+numComments=3

@@ -62,6 +62,8 @@ public class Game
     {
         createStartScreen();
         createRooms();
+        createItems();
+        createInventory();
         parser = new Parser();
     }
     
@@ -220,6 +222,16 @@ public class Game
         office.setExit(r.getString("west"), lab);
 
         currentRoom = outside;  // start game outside
+    }
+    
+    private void createItems(){
+        Item dragonKey;
+        
+        dragonKey = new Item("A key that is somewhat shaped like a dragon.");
+    }
+    
+    private void createInventory(){
+        Inventory inventaris;
     }
 
     /**
