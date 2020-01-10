@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.ArrayList;
 
 public class Game 
 {
@@ -48,12 +49,13 @@ public class Game
     JButton startButton, option1, option2, language1, language2, confirmInputButton;
     JTextArea mainTextArea;
     JTextField userInput;
-    Locale deutsch = new Locale("ge", "GE");
-    Locale nederlands = new Locale("nl", "NL");
-    Locale english = new Locale("en", "EN");
-    ResourceBundle r = ResourceBundle.getBundle("Bundle", english);
+    public static Locale deutsch = new Locale("ge", "GE");
+    public static Locale nederlands = new Locale("nl", "NL");
+    public static Locale english = new Locale("en", "EN");
+    public static ResourceBundle r = ResourceBundle.getBundle("Bundle", english);
     String getValue;
     TitleScreenHandler tsHandler = new TitleScreenHandler();
+    ArrayList<Room> roomHistory = new ArrayList<Room>();
     
     /**
      * Create the game and initialise its internal map.
@@ -108,6 +110,7 @@ public class Game
         language1.setBackground(Color.black);
         language1.setForeground(Color.white);
         language1.setFont(normalFont);
+        language1.addActionListener(tsHandler);
         languagePanel.add(language1);
         
         language2 = new JButton("De");
@@ -133,7 +136,6 @@ public class Game
         optionPanel.setBounds(250, 350, 300, 50);
         optionPanel.setBackground(Color.black);
         optionPanel.setLayout(new GridLayout(4, 1));
-        
         
         option1 = new JButton("Option 1");
         option1.setBackground(Color.black);
@@ -220,10 +222,11 @@ public class Game
         office.setExit(r.getString("west"), lab);
 
         currentRoom = outside;  // start game outside
+        roomHistory.add(currentRoom);
     }
 
     /**
-     *  Main play routine.
+     *  Start play routine.
      *  Instead of a loop event triggers are used.
      */
     public void play() 
@@ -231,22 +234,7 @@ public class Game
         createGameScreen();
         printWelcome();
     }
-    /*
-    public void play() 
-    {            
-        printWelcome();
-
-        // Enter the main command loop.  Here we repeatedly read commands and
-        // execute them until the game is over.
-                
-        boolean finished = false;
-        while (! finished) {
-            Command command = parser.getCommand();
-            finished = processCommand(command);
-        }
-        System.out.println("Thank you for playing.  Good bye.");
-    }*/
-
+    
     /**
      * Print out the opening message for the player.
      */
@@ -282,11 +270,17 @@ public class Game
             case QUIT:
                 wantToQuit = quit(command);
                 break;
+            
+            case BACK:
+                goBack();
+                break;
+            
+            case LOOK:
+                look();
+                break;
         }
         return wantToQuit;
     }
-
-    // implementations of user commands:
 
     /**
      * Print out some help information.
@@ -311,8 +305,7 @@ public class Game
         }
 
         String direction = command.getSecondWord();
-
-        // Try to leave current room.
+         // Try to leave current room.
         Room nextRoom = currentRoom.getExit(direction);
 
         if (nextRoom == null) {
@@ -320,11 +313,32 @@ public class Game
         }
         else {
             currentRoom = nextRoom;
-            mainTextArea.setText(currentRoom.getLongDescription());
+            roomHistory.add(currentRoom);
+            mainTextArea.setText(currentRoom.getLongDescription());         
         }
     }
     
-  
+    /**
+     * Change the current room to the previous room.
+     */
+    private void goBack(){
+        if(roomHistory.size() >= 2){
+            currentRoom = roomHistory.get(roomHistory.size() - 2);
+            mainTextArea.setText(currentRoom.getLongDescription());
+            roomHistory.remove(roomHistory.size() - 1);
+        }
+        else {
+            mainTextArea.setText(r.getString("cannotBack"));
+        }
+    }
+    
+    
+    /**
+     * Sets the textArea to a description of the current room.
+     */
+    private void look(){
+        mainTextArea.setText(currentRoom.getLongDescription());
+    }
     
     /** 
      * "Quit" was entered. Check the rest of the command to see
@@ -344,7 +358,9 @@ public class Game
     }
     
   
-    
+    /**
+     * 
+     */
     public class TitleScreenHandler implements ActionListener
     {
         public void actionPerformed(ActionEvent event)
@@ -354,10 +370,13 @@ public class Game
             }
             else if (language1.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", english);
+                createRooms();
+                CommandWords.resetEnum(english);
             }
             else if (language2.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", deutsch);
                 createRooms();
+                CommandWords.resetEnum(deutsch);
             }
             else if (confirmInputButton.equals(event.getSource())){
                 getValue = userInput.getText();

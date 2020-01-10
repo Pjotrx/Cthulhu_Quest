@@ -60,9 +60,17 @@ public class Room
      */
     public String getLongDescription()
     {
-        return "You are " + description + ".\n" + getExitString();
+        return Game.r.getString("youAre") + " " + description + ".\n" + getExitString();
     }
-
+    
+    /**
+     * resets the description with a new string
+     * useful when the prefered language has changed
+     */
+    public void resetDescription(String newDescription){
+        description = newDescription;
+    }
+    
     /**
      * Return a string describing the room's exits, for example
      * "Exits: north west".
@@ -70,7 +78,7 @@ public class Room
      */
     private String getExitString()
     {
-        String returnString = "Exits:";
+        String returnString = Game.r.getString("exits");
         Set<String> keys = exits.keySet();
         for(String exit : keys) {
             returnString += " " + exit;
