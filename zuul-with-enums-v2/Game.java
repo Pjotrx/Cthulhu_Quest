@@ -15,19 +15,8 @@
  * @version 2016.02.29
  */
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -35,168 +24,39 @@ import java.util.ArrayList;
 
 public class Game 
 {
-    private Parser parser;
-    private Room currentRoom;
+    private static Parser parser = new Parser();
+    private static Room currentRoom;
     private boolean parse = false;
     
-    JFrame window;
-    Container con;
-    JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
-    JLabel titleLabel;
-    Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
-    Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
-    Font smallFont = new Font("Times New Roman", Font.PLAIN, 12);
-    JButton startButton, option1, option2, language1, language2, confirmInputButton;
-    JTextArea mainTextArea;
-    JTextField userInput;
+    
+    
+    public static Display display = new Display();
+   
+    
     public static Locale deutsch = new Locale("ge", "GE");
     public static Locale nederlands = new Locale("nl", "NL");
     public static Locale english = new Locale("en", "EN");
     public static ResourceBundle r = ResourceBundle.getBundle("Bundle", english);
-    String getValue;
-    TitleScreenHandler tsHandler = new TitleScreenHandler();
-    ArrayList<Room> roomHistory = new ArrayList<Room>();
+    public static String getValue;
+    public static TitleScreenHandler tsHandler = new TitleScreenHandler();
+    private static ArrayList<Room> roomHistory = new ArrayList<Room>();
     
     /**
      * Create the game and initialise its internal map.
      */
-    public Game() 
-    {
-        createStartScreen();
+    public static void main(String[] args)
+    { 
+        display.createStartScreen();
         createRooms();
-        parser = new Parser();
+        //Parser parser = new Parser();
     }
     
-    /**
-     * Create a window with the start button etc
-     */
-    public void createStartScreen(){
-        window = new JFrame();
-        window.setSize(800, 600);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly
-        window.getContentPane().setBackground(Color.black);
-        window.setLayout(null); //set default layout to null
-        
-        con = window.getContentPane();
-        
-        titlePanel = new JPanel();
-        titlePanel.setBounds(100, 100, 600, 150);       // (xpos, ypos, width, height)
-        titlePanel.setBackground(Color.black);
-        
-        titleLabel = new JLabel("C̶͉͉͆̈ẗ̶͓̤̓̐̚͝ẖ̴̀͝u̴͌̆̄ͅl̵̢̡̒h̷̢̛̛͔̀̈́͠ǘ̷̢̨͚͍́̈͊̆ ̷̬̓͗́̇Q̴̗̰̖͈̟͊͝û̷͔̝̗̫͗͝͝è̵̺s̶̰͒̀̔ṭ̴̡̞̝͊");
-        titleLabel.setForeground(Color.white);
-        titleLabel.setFont(titleFont);
-        
-        startButtonPanel = new JPanel();
-        startButtonPanel.setBounds(300, 400, 200, 100);
-        startButtonPanel.setBackground(Color.black);
-        
-        startButton = new JButton("START");
-        startButton.setBackground(Color.black);
-        startButton.setForeground(Color.white);
-        startButton.setFont(normalFont);
-        startButton.addActionListener(tsHandler);
-        
-        
-        //needs to be added to optionScreen
-        //==============================
-        languagePanel = new JPanel();
-        languagePanel.setBounds(20, 20, 200, 50);
-        languagePanel.setBackground(Color.black);
-        languagePanel.setLayout(new GridLayout(1, 4));
-        con.add(languagePanel);
-        
-        language1 = new JButton("En");
-        language1.setBackground(Color.black);
-        language1.setForeground(Color.white);
-        language1.setFont(normalFont);
-        language1.addActionListener(tsHandler);
-        languagePanel.add(language1);
-        
-        language2 = new JButton("De");
-        language2.setBackground(Color.black);
-        language2.setForeground(Color.white);
-        language2.setFont(normalFont);
-        language2.addActionListener(tsHandler);
-        languagePanel.add(language2);
-        //==============================
-        
-        titlePanel.add(titleLabel);
-        startButtonPanel.add(startButton);
-        con.add(titlePanel);
-        con.add(startButtonPanel);
-        window.setVisible(true);
-    }
-    /**
-     * Creates a screen to display settings.
-     * Not finished or even functional
-     */
-    public void creatOptionScreen(){
-        optionPanel = new JPanel();
-        optionPanel.setBounds(250, 350, 300, 50);
-        optionPanel.setBackground(Color.black);
-        optionPanel.setLayout(new GridLayout(4, 1));
-        
-        option1 = new JButton("Option 1");
-        option1.setBackground(Color.black);
-        option1.setForeground(Color.white);
-        option1.setFont(normalFont);
-        optionPanel.add(option1);
-        
-        option2 = new JButton("Option 2");
-        option2.setBackground(Color.black);
-        option2.setForeground(Color.white);
-        option2.setFont(normalFont);
-        optionPanel.add(option2);
-        
-        con.add(optionPanel);
-    }
     
-    /**
-     * Creates a main JTextArea to display descriptions and instructions.
-     * As well as an JTextField and submit button for user input.
-     */
-    public void createGameScreen() 
-    {
-        titlePanel.setVisible(false);
-        languagePanel.setVisible(false);
-        startButtonPanel.setVisible(false);
-        
-        mainText = new JPanel();
-        mainText.setBounds(100, 100, 600, 250);
-        mainText.setBackground(Color.black);
-        con.add(mainText);
-        
-        mainTextArea = new JTextArea("this is the main text Area");
-        mainTextArea.setBounds(100, 100, 600, 250);
-        mainTextArea.setBackground(Color.black);
-        mainTextArea.setForeground(Color.white);
-        mainTextArea.setEditable(false);
-        mainTextArea.setFont(normalFont);
-        mainTextArea.setLineWrap(true);
-        
-        mainText.add(mainTextArea);
-        
-        inputPanel = new JPanel();
-        inputPanel.setBounds(250, 350, 300, 50);
-        inputPanel.setBackground(Color.black);
-        inputPanel.setLayout(new GridLayout(2, 1));
-        con.add(inputPanel);
-       
-        userInput = new JTextField("");
-        confirmInputButton = new JButton("confirm");
-        confirmInputButton.setBounds(550, 350, 50, 50);
-        confirmInputButton.addActionListener(tsHandler);
-        inputPanel.add(userInput);
-        con.add(confirmInputButton);
-        
-        window.getRootPane().setDefaultButton(confirmInputButton);
-    }
     
     /**
      * Create all the rooms and link their exits together.
      */
-    private void createRooms()
+    private static void createRooms()
     {
         Room outside, theater, pub, lab, office;
       
@@ -231,16 +91,16 @@ public class Game
      */
     public void play() 
     {           
-        createGameScreen();
+        display.createGameScreen();
         printWelcome();
     }
     
     /**
      * Print out the opening message for the player.
      */
-    public void printWelcome()
+    public static void printWelcome()
     {   
-        mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
+        Display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
     }
 
     /**
@@ -248,7 +108,7 @@ public class Game
      * @param command The command to be processed.
      * @return true If the command ends the game, false otherwise.
      */
-    private boolean processCommand(Command command) 
+    public static boolean processCommand(Command command) 
     {
         boolean wantToQuit = false;
 
@@ -256,7 +116,7 @@ public class Game
 
         switch (commandWord) {
             case UNKNOWN:
-                mainTextArea.setText(r.getString("unknown"));
+                Display.mainTextArea.setText(r.getString("unknown"));
                 break;
 
             case HELP:
@@ -287,20 +147,21 @@ public class Game
      * Here we print some stupid, cryptic message and a list of the 
      * command words.
      */
-    private void printHelp() 
+    private static void printHelp() 
     {
-        mainTextArea.setText(r.getString("helpText") + parser.showCommands());
+        System.out.println("hulp gevraagd");
+        display.mainTextArea.setText(r.getString("helpText") + parser.showCommands());
     }
 
     /** 
      * Try to go in one direction. If there is an exit, enter the new
      * room, otherwise print an error message.
      */
-    private void goRoom(Command command) 
+    private static void goRoom(Command command) 
     {
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
-            mainTextArea.setText(r.getString("goWhere"));
+            display.mainTextArea.setText(r.getString("goWhere"));
             return;
         }
 
@@ -309,26 +170,26 @@ public class Game
         Room nextRoom = currentRoom.getExit(direction);
 
         if (nextRoom == null) {
-            mainTextArea.append("\n" + r.getString("noDoor"));
+            Display.mainTextArea.append("\n" + r.getString("noDoor"));
         }
         else {
             currentRoom = nextRoom;
             roomHistory.add(currentRoom);
-            mainTextArea.setText(currentRoom.getLongDescription());         
+            Display.mainTextArea.setText(currentRoom.getLongDescription());         
         }
     }
     
     /**
      * Change the current room to the previous room.
      */
-    private void goBack(){
+    private static void goBack(){
         if(roomHistory.size() >= 2){
             currentRoom = roomHistory.get(roomHistory.size() - 2);
-            mainTextArea.setText(currentRoom.getLongDescription());
+            Display.mainTextArea.setText(currentRoom.getLongDescription());
             roomHistory.remove(roomHistory.size() - 1);
         }
         else {
-            mainTextArea.setText(r.getString("cannotBack"));
+            Display.mainTextArea.setText(r.getString("cannotBack"));
         }
     }
     
@@ -336,8 +197,8 @@ public class Game
     /**
      * Sets the textArea to a description of the current room.
      */
-    private void look(){
-        mainTextArea.setText(currentRoom.getLongDescription());
+    private static void look(){
+        Display.mainTextArea.setText(currentRoom.getLongDescription());
     }
     
     /** 
@@ -345,14 +206,14 @@ public class Game
      * whether we really quit the game.
      * @return true, if this command quits the game, false otherwise.
      */
-    private boolean quit(Command command) 
+    private static boolean quit(Command command) 
     {
         if(command.hasSecondWord()) {
-            mainTextArea.setText(r.getString("quitWhat"));
+            Display.mainTextArea.setText(r.getString("quitWhat"));
             return false;
         }
         else {
-            mainTextArea.setText("Just press the X");
+            Display.mainTextArea.setText("Just press the X");
             return true;  // signal that we want to quit
         }
     }
@@ -361,27 +222,31 @@ public class Game
     /**
      * 
      */
-    public class TitleScreenHandler implements ActionListener
+    public static class TitleScreenHandler implements ActionListener
     {
         public void actionPerformed(ActionEvent event)
         {
-            if(startButton.equals(event.getSource())){
-              play();
+            if(display.startButton.equals(event.getSource())){
+              //play();
+              
+              display.createGameScreen();
+              printWelcome(); 
+              System.out.println("succes");
             }
-            else if (language1.equals(event.getSource())){
+            else if (Display.language1.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", english);
                 createRooms();
                 CommandWords.resetEnum(english);
             }
-            else if (language2.equals(event.getSource())){
+            else if (Display.language2.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", deutsch);
                 createRooms();
                 CommandWords.resetEnum(deutsch);
             }
-            else if (confirmInputButton.equals(event.getSource())){
-                getValue = userInput.getText();
+            else if (display.confirmInputButton.equals(event.getSource())){
+                getValue = display.userInput.getText();
                 System.out.println(getValue);   //just for debugging
-                userInput.setText("");
+                display.userInput.setText("");
                 
                 boolean finished = false;                 
                 Command command = parser.getCommand(getValue);
