@@ -33,14 +33,12 @@ public class Parser
     /**
      * @return The next command from the user.
      */
-    /*
     public Command getCommand() 
     {
         String inputLine;   // will hold the full input line
-        String word1 = "";
-        String word2 = "";
-        System.out.println(word1);
-        /*
+        String word1 = null;
+        String word2 = null;
+
         System.out.print("> ");     // print prompt
 
         inputLine = reader.nextLine();
@@ -57,27 +55,12 @@ public class Parser
 
         return new Command(commands.getCommandWord(word1), word2);
     }
-    */
-    
-    public Command getCommand(String input) 
-    {
-        String[] inputLine = input.split(" ");  // will hold the full input line
-        String word1 = inputLine[0];
-        String word2 = null;
-        if(inputLine.length >= 2){
-            word2 = inputLine[1];
-        }
-        
-        return new Command(commands.getCommandWord(word1), word2);
-    } 
 
     /**
      * Print out a list of valid command words.
      */
-    public String showCommands()
+    public void showCommands()
     {
         commands.showAll();
-        
-        return commands.printAll();
     }
 }

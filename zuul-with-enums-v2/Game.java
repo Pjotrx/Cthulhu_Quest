@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  *  This class is the main class of the "World of Zuul" application. 
  *  "World of Zuul" is a very simple, text based adventure game.  Users 
@@ -15,184 +17,28 @@
  * @version 2016.02.29
  */
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.ArrayList;
-
 public class Game 
 {
     private Parser parser;
     private Room currentRoom;
-    private boolean parse = false;
-    
-    JFrame window;
-    Container con;
-    JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
-    JLabel titleLabel;
-    Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
-    Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
-    Font smallFont = new Font("Times New Roman", Font.PLAIN, 12);
-    JButton startButton, option1, option2, language1, language2, confirmInputButton;
-    JTextArea mainTextArea;
-    JTextField userInput;
-    public static Locale deutsch = new Locale("ge", "GE");
-    public static Locale nederlands = new Locale("nl", "NL");
-    public static Locale english = new Locale("en", "EN");
-    public static ResourceBundle r = ResourceBundle.getBundle("Bundle", english);
-    String getValue;
-    TitleScreenHandler tsHandler = new TitleScreenHandler();
-    ArrayList<Room> roomHistory = new ArrayList<Room>();
-    
+    private ArrayList<Item> inventory;      //.     Items are added in the take item command located below
+        
     /**
      * Create the game and initialise its internal map.
      */
     public Game() 
     {
-        createStartScreen();
         createRooms();
         parser = new Parser();
+        //createItems();          //.   Decided to take another route for this shit
+        createInventory();      //.
     }
     
-    /**
-     * Create a window with the start button etc
-     */
-    public void createStartScreen(){
-        window = new JFrame();
-        window.setSize(800, 600);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly
-        window.getContentPane().setBackground(Color.black);
-        window.setLayout(null); //set default layout to null
-        
-        con = window.getContentPane();
-        
-        titlePanel = new JPanel();
-        titlePanel.setBounds(100, 100, 600, 150);       // (xpos, ypos, width, height)
-        titlePanel.setBackground(Color.black);
-        
-        titleLabel = new JLabel("C̶͉͉͆̈ẗ̶͓̤̓̐̚͝ẖ̴̀͝u̴͌̆̄ͅl̵̢̡̒h̷̢̛̛͔̀̈́͠ǘ̷̢̨͚͍́̈͊̆ ̷̬̓͗́̇Q̴̗̰̖͈̟͊͝û̷͔̝̗̫͗͝͝è̵̺s̶̰͒̀̔ṭ̴̡̞̝͊");
-        titleLabel.setForeground(Color.white);
-        titleLabel.setFont(titleFont);
-        
-        startButtonPanel = new JPanel();
-        startButtonPanel.setBounds(300, 400, 200, 100);
-        startButtonPanel.setBackground(Color.black);
-        
-        startButton = new JButton("START");
-        startButton.setBackground(Color.black);
-        startButton.setForeground(Color.white);
-        startButton.setFont(normalFont);
-        startButton.addActionListener(tsHandler);
-        
-        
-        //needs to be added to optionScreen
-        //==============================
-        languagePanel = new JPanel();
-        languagePanel.setBounds(20, 20, 200, 50);
-        languagePanel.setBackground(Color.black);
-        languagePanel.setLayout(new GridLayout(1, 4));
-        con.add(languagePanel);
-        
-        language1 = new JButton("En");
-        language1.setBackground(Color.black);
-        language1.setForeground(Color.white);
-        language1.setFont(normalFont);
-        language1.addActionListener(tsHandler);
-        languagePanel.add(language1);
-        
-        language2 = new JButton("De");
-        language2.setBackground(Color.black);
-        language2.setForeground(Color.white);
-        language2.setFont(normalFont);
-        language2.addActionListener(tsHandler);
-        languagePanel.add(language2);
-        //==============================
-        
-        titlePanel.add(titleLabel);
-        startButtonPanel.add(startButton);
-        con.add(titlePanel);
-        con.add(startButtonPanel);
-        window.setVisible(true);
+    public static void main(String[] args){
+        Game game = new Game();
+        game.play();
     }
-    /**
-     * Creates a screen to display settings.
-     * Not finished or even functional
-     */
-    public void creatOptionScreen(){
-        optionPanel = new JPanel();
-        optionPanel.setBounds(250, 350, 300, 50);
-        optionPanel.setBackground(Color.black);
-        optionPanel.setLayout(new GridLayout(4, 1));
-        
-        option1 = new JButton("Option 1");
-        option1.setBackground(Color.black);
-        option1.setForeground(Color.white);
-        option1.setFont(normalFont);
-        optionPanel.add(option1);
-        
-        option2 = new JButton("Option 2");
-        option2.setBackground(Color.black);
-        option2.setForeground(Color.white);
-        option2.setFont(normalFont);
-        optionPanel.add(option2);
-        
-        con.add(optionPanel);
-    }
-    
-    /**
-     * Creates a main JTextArea to display descriptions and instructions.
-     * As well as an JTextField and submit button for user input.
-     */
-    public void createGameScreen() 
-    {
-        titlePanel.setVisible(false);
-        languagePanel.setVisible(false);
-        startButtonPanel.setVisible(false);
-        
-        mainText = new JPanel();
-        mainText.setBounds(100, 100, 600, 250);
-        mainText.setBackground(Color.black);
-        con.add(mainText);
-        
-        mainTextArea = new JTextArea("this is the main text Area");
-        mainTextArea.setBounds(100, 100, 600, 250);
-        mainTextArea.setBackground(Color.black);
-        mainTextArea.setForeground(Color.white);
-        mainTextArea.setEditable(false);
-        mainTextArea.setFont(normalFont);
-        mainTextArea.setLineWrap(true);
-        
-        mainText.add(mainTextArea);
-        
-        inputPanel = new JPanel();
-        inputPanel.setBounds(250, 350, 300, 50);
-        inputPanel.setBackground(Color.black);
-        inputPanel.setLayout(new GridLayout(2, 1));
-        con.add(inputPanel);
-       
-        userInput = new JTextField("");
-        confirmInputButton = new JButton("confirm");
-        confirmInputButton.setBounds(550, 350, 50, 50);
-        confirmInputButton.addActionListener(tsHandler);
-        inputPanel.add(userInput);
-        con.add(confirmInputButton);
-        
-        window.getRootPane().setDefaultButton(confirmInputButton);
-    }
-    
+
     /**
      * Create all the rooms and link their exits together.
      */
@@ -201,46 +47,62 @@ public class Game
         Room outside, theater, pub, lab, office;
       
         // create the rooms
-        outside = new Room(r.getString("outside"));
-        theater = new Room(r.getString("theater"));
-        pub = new Room(r.getString("pub"));
-        lab = new Room(r.getString("lab"));
-        office = new Room(r.getString("office"));
+        outside = new Room("outside the main entrance of the university");
+        theater = new Room("in a lecture theater");
+        pub = new Room("in the campus pub");
+        lab = new Room("in a computing lab");
+        office = new Room("in the computing admin office");
         
         // initialise room exits
-        outside.setExit(r.getString("east"), theater);
-        outside.setExit(r.getString("south"), lab);
-        outside.setExit(r.getString("west"), pub);
+        outside.setExit("east", theater);
+        outside.setExit("south", lab);
+        outside.setExit("west", pub);
 
-        theater.setExit(r.getString("west"), outside);
+        theater.setExit("west", outside);
 
-        pub.setExit(r.getString("east"), outside);
+        pub.setExit("east", outside);
 
-        lab.setExit(r.getString("north"), outside);
-        lab.setExit(r.getString("east"), office);
+        lab.setExit("north", outside);
+        lab.setExit("east", office);
 
-        office.setExit(r.getString("west"), lab);
+        office.setExit("west", lab);
 
         currentRoom = outside;  // start game outside
-        roomHistory.add(currentRoom);
     }
-
-    /**
-     *  Start play routine.
-     *  Instead of a loop event triggers are used.
-     */
-    public void play() 
-    {           
-        createGameScreen();
-        printWelcome();
+   
+    private void createInventory(){         //.
+        inventory = new ArrayList<>();
     }
     
     /**
+     *  Main play routine.  Loops until end of play.
+     */
+    public void play() 
+    {            
+        printWelcome();
+
+        // Enter the main command loop.  Here we repeatedly read commands and
+        // execute them until the game is over.
+                
+        boolean finished = false;
+        while (! finished) {
+            Command command = parser.getCommand();
+            finished = processCommand(command);
+        }
+        System.out.println("Thank you for playing.  Good bye.");
+    }
+
+    /**
      * Print out the opening message for the player.
      */
-    public void printWelcome()
-    {   
-        mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
+    private void printWelcome()
+    {
+        System.out.println();
+        System.out.println("Welcome to the World of Zuul!");
+        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
+        System.out.println("Type '" + CommandWord.HELP + "' if you need help.");
+        System.out.println();
+        System.out.println(currentRoom.getLongDescription());
     }
 
     /**
@@ -256,7 +118,7 @@ public class Game
 
         switch (commandWord) {
             case UNKNOWN:
-                mainTextArea.setText(r.getString("unknown"));
+                System.out.println("I don't know what you mean...");
                 break;
 
             case HELP:
@@ -270,17 +132,19 @@ public class Game
             case QUIT:
                 wantToQuit = quit(command);
                 break;
-            
-            case BACK:
-                goBack();
+                
+            case TAKE:                  //.
+                takeItem(command);
                 break;
-            
-            case LOOK:
-                look();
+                
+            case INVENTORY:             //.
+                printInventory();
                 break;
         }
         return wantToQuit;
     }
+
+    // implementations of user commands:
 
     /**
      * Print out some help information.
@@ -289,9 +153,19 @@ public class Game
      */
     private void printHelp() 
     {
-        mainTextArea.setText(r.getString("helpText") + parser.showCommands());
+        System.out.println("You are lost. You are alone. You wander");
+        System.out.println("around at the university.");
+        System.out.println();
+        System.out.println("Your command words are:");
+        parser.showCommands();
     }
-
+    
+    private void printInventory(){
+        for(Item item : inventory){
+            System.out.println(item.getName() + ":  " + item.getDescription());
+        }
+    }
+    
     /** 
      * Try to go in one direction. If there is an exit, enter the new
      * room, otherwise print an error message.
@@ -300,44 +174,47 @@ public class Game
     {
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
-            mainTextArea.setText(r.getString("goWhere"));
+            System.out.println("Go where?");
             return;
         }
 
         String direction = command.getSecondWord();
-         // Try to leave current room.
+
+        // Try to leave current room.
         Room nextRoom = currentRoom.getExit(direction);
 
         if (nextRoom == null) {
-            mainTextArea.append("\n" + r.getString("noDoor"));
+            System.out.println("There is no door!");
         }
         else {
             currentRoom = nextRoom;
-            roomHistory.add(currentRoom);
-            mainTextArea.setText(currentRoom.getLongDescription());         
+            System.out.println(currentRoom.getLongDescription());
         }
     }
     
-    /**
-     * Change the current room to the previous room.
+    /*
+     *  Checks if a  
      */
-    private void goBack(){
-        if(roomHistory.size() >= 2){
-            currentRoom = roomHistory.get(roomHistory.size() - 2);
-            mainTextArea.setText(currentRoom.getLongDescription());
-            roomHistory.remove(roomHistory.size() - 1);
+    private void takeItem(Command command){       //.
+        if(!command.hasSecondWord()){
+            System.out.println("Take what, u doofus?");
+            return;
         }
-        else {
-            mainTextArea.setText(r.getString("cannotBack"));
+        
+        String itemToTake = command.getSecondWord();
+        
+        switch(itemToTake)
+        {
+            case "branch":
+                if(currentRoom.getShortDescription() == "outside the main entrance of the university"){
+                    inventory.add(new Item("Branch","An ordinary branch. Why did you pick this up again?"));
+                    System.out.println("You picked up a branch, I guess. What are you gonna do with it, play fetch with yourself? Haha");
+                } else {
+                    System.out.println("I don't see any trees growing in here, do you dumbass?");
+                }
+                break;
+            //feel free to add more items here. Convention is to put a Case with the name of the item, and in that case a roomcheck before you add it
         }
-    }
-    
-    
-    /**
-     * Sets the textArea to a description of the current room.
-     */
-    private void look(){
-        mainTextArea.setText(currentRoom.getLongDescription());
     }
     
     /** 
@@ -348,52 +225,11 @@ public class Game
     private boolean quit(Command command) 
     {
         if(command.hasSecondWord()) {
-            mainTextArea.setText(r.getString("quitWhat"));
+            System.out.println("Quit what?");
             return false;
         }
         else {
-            mainTextArea.setText("Just press the X");
             return true;  // signal that we want to quit
         }
     }
-    
-  
-    /**
-     * 
-     */
-    public class TitleScreenHandler implements ActionListener
-    {
-        public void actionPerformed(ActionEvent event)
-        {
-            if(startButton.equals(event.getSource())){
-              play();
-            }
-            else if (language1.equals(event.getSource())){
-                r = ResourceBundle.getBundle("Bundle", english);
-                createRooms();
-                CommandWords.resetEnum(english);
-            }
-            else if (language2.equals(event.getSource())){
-                r = ResourceBundle.getBundle("Bundle", deutsch);
-                createRooms();
-                CommandWords.resetEnum(deutsch);
-            }
-            else if (confirmInputButton.equals(event.getSource())){
-                getValue = userInput.getText();
-                System.out.println(getValue);   //just for debugging
-                userInput.setText("");
-                
-                boolean finished = false;                 
-                Command command = parser.getCommand(getValue);
-                finished = processCommand(command);                
-            }
-            
-            
-        }
-    }
-        
-      
 }
-
-
-    
