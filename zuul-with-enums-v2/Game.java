@@ -15,8 +15,19 @@
  * @version 2016.02.29
  */
 
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -24,39 +35,52 @@ import java.util.ArrayList;
 
 public class Game 
 {
-    private static Parser parser = new Parser();
-    private static Room currentRoom;
+    private Parser parser;
+    private Room currentRoom;
     private boolean parse = false;
     
+    public static Display display;
     
-    
-    public static Display display = new Display(6, 7);
-   
-    
+    JFrame window;
+    Container con;
+    JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
+    JLabel titleLabel;
+    Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
+    Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
+    Font smallFont = new Font("Times New Roman", Font.PLAIN, 12);
+    JButton startButton, option1, option2, language1, language2, confirmInputButton;
+    JTextArea mainTextArea;
+    JTextField userInput;
     public static Locale deutsch = new Locale("ge", "GE");
     public static Locale nederlands = new Locale("nl", "NL");
     public static Locale english = new Locale("en", "EN");
     public static ResourceBundle r = ResourceBundle.getBundle("Bundle", english);
-    public static String getValue;
-    public static TitleScreenHandler tsHandler = new TitleScreenHandler();
-    private static ArrayList<Room> roomHistory = new ArrayList<Room>();
+    static String getValue;
+    TitleScreenHandler tsHandler = new TitleScreenHandler();
+    ArrayList<Room> roomHistory = new ArrayList<Room>();
+    
+    
+    
+    public static void main(String[] args){
+        Game game = new Game();
+    }
     
     /**
      * Create the game and initialise its internal map.
      */
-    public static void main(String[] args)
-    { 
-        display.createStartScreen();
+    public Game() 
+    {
+        
         createRooms();
-        //Parser parser = new Parser();
+        parser = new Parser();
+        createDisplay();
     }
-    
     
     
     /**
      * Create all the rooms and link their exits together.
      */
-    private static void createRooms()
+    private void createRooms()
     {
         Room outside, theater, pub, lab, office;
       
@@ -85,29 +109,65 @@ public class Game
         roomHistory.add(currentRoom);
     }
     
-    private void createScreens(){
-        Display start, game;
+    
+    /**
+     * Create all the elements of the display
+     */
+    private void createDisplay(){
+        display = new Display(800, 600, "button", Color.white, Color.black);
+        display.setButtonPanel(300, 400, 200, 100, Color.black);
+        display.setInputPanel(250,350,300,50,Color.blue);
+        display.setLanguagePanel(10, 10, 50, 100, Color.black);
+        display.setMainTextPanel(100,100,600,250,Color.black);
+        display.setMainTextArea(100,100,600,250,"test",Color.black,Color.white);
+        display.addButtons(tsHandler, "start", "confirm", "En", "De", "back", Color.black, Color.white);
         
-        
-        
+        showScreen(1);
+        printWelcome();
     }
-
+    
+    /**
+     * Switch between different screens
+     * start screen: 1
+     * game screen: 2
+     * option screen: 3
+     */
+    private void showScreen(int i){
+        switch(i){
+            case 1:
+                //show start
+                display.inputPanel.setVisible(false);
+                display.mainText.setVisible(false);
+                display.buttonPanel.setVisible(true);
+                break;
+            case 2:
+                
+                display.buttonPanel.setVisible(false);
+                display.inputPanel.setVisible(true);
+                display.mainText.setVisible(true);
+                break;
+            case 3:
+                //show options
+                break;
+        }
+    }
+    
     /**
      *  Start play routine.
      *  Instead of a loop event triggers are used.
      */
     public void play() 
     {           
-        display.createGameScreen();
+        
         printWelcome();
     }
     
     /**
      * Print out the opening message for the player.
      */
-    public static void printWelcome()
+    public void printWelcome()
     {   
-        Display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
+        display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
     }
 
     /**
@@ -115,7 +175,7 @@ public class Game
      * @param command The command to be processed.
      * @return true If the command ends the game, false otherwise.
      */
-    public static boolean processCommand(Command command) 
+    private boolean processCommand(Command command) 
     {
         boolean wantToQuit = false;
 
@@ -123,7 +183,7 @@ public class Game
 
         switch (commandWord) {
             case UNKNOWN:
-                Display.mainTextArea.setText(r.getString("unknown"));
+                display.mainTextArea.setText(r.getString("unknown"));
                 break;
 
             case HELP:
@@ -154,9 +214,8 @@ public class Game
      * Here we print some stupid, cryptic message and a list of the 
      * command words.
      */
-    private static void printHelp() 
+    private void printHelp() 
     {
-        System.out.println("hulp gevraagd");
         display.mainTextArea.setText(r.getString("helpText") + parser.showCommands());
     }
 
@@ -164,7 +223,7 @@ public class Game
      * Try to go in one direction. If there is an exit, enter the new
      * room, otherwise print an error message.
      */
-    private static void goRoom(Command command) 
+    private void goRoom(Command command) 
     {
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
@@ -177,26 +236,26 @@ public class Game
         Room nextRoom = currentRoom.getExit(direction);
 
         if (nextRoom == null) {
-            Display.mainTextArea.append("\n" + r.getString("noDoor"));
+            display.mainTextArea.append("\n" + r.getString("noDoor"));
         }
         else {
             currentRoom = nextRoom;
             roomHistory.add(currentRoom);
-            Display.mainTextArea.setText(currentRoom.getLongDescription());         
+            display.mainTextArea.setText(currentRoom.getLongDescription());         
         }
     }
     
     /**
      * Change the current room to the previous room.
      */
-    private static void goBack(){
+    private void goBack(){
         if(roomHistory.size() >= 2){
             currentRoom = roomHistory.get(roomHistory.size() - 2);
-            Display.mainTextArea.setText(currentRoom.getLongDescription());
+            display.mainTextArea.setText(currentRoom.getLongDescription());
             roomHistory.remove(roomHistory.size() - 1);
         }
         else {
-            Display.mainTextArea.setText(r.getString("cannotBack"));
+            display.mainTextArea.setText(r.getString("cannotBack"));
         }
     }
     
@@ -204,8 +263,8 @@ public class Game
     /**
      * Sets the textArea to a description of the current room.
      */
-    private static void look(){
-        Display.mainTextArea.setText(currentRoom.getLongDescription());
+    private void look(){
+        display.mainTextArea.setText(currentRoom.getLongDescription());
     }
     
     /** 
@@ -213,14 +272,14 @@ public class Game
      * whether we really quit the game.
      * @return true, if this command quits the game, false otherwise.
      */
-    private static boolean quit(Command command) 
+    private boolean quit(Command command) 
     {
         if(command.hasSecondWord()) {
-            Display.mainTextArea.setText(r.getString("quitWhat"));
+            display.mainTextArea.setText(r.getString("quitWhat"));
             return false;
         }
         else {
-            Display.mainTextArea.setText("Just press the X");
+            display.mainTextArea.setText("Just press the X");
             return true;  // signal that we want to quit
         }
     }
@@ -229,35 +288,34 @@ public class Game
     /**
      * 
      */
-    public static class TitleScreenHandler implements ActionListener
+    public class TitleScreenHandler implements ActionListener
     {
         public void actionPerformed(ActionEvent event)
         {
             if(display.startButton.equals(event.getSource())){
-              //play();
-              
-              display.createGameScreen();
-              printWelcome(); 
-              System.out.println("succes");
+              showScreen(2);
             }
-            else if (Display.language1.equals(event.getSource())){
+            else if (display.language1.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", english);
                 createRooms();
                 CommandWords.resetEnum(english);
             }
-            else if (Display.language2.equals(event.getSource())){
+            else if (display.language2.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", deutsch);
                 createRooms();
                 CommandWords.resetEnum(deutsch);
             }
             else if (display.confirmInputButton.equals(event.getSource())){
                 getValue = display.userInput.getText();
-                System.out.println(getValue);   //just for debugging
+                //System.out.println(getValue);   //just for debugging
                 display.userInput.setText("");
                 
                 boolean finished = false;                 
                 Command command = parser.getCommand(getValue);
                 finished = processCommand(command);                
+            }
+            else if (display.backButton.equals(event.getSource())){
+                showScreen(1);
             }
             
             
