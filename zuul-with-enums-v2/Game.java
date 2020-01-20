@@ -40,6 +40,7 @@ public class Game
     private boolean parse = false;
     
     public static Display display;
+    public static TypeWriter typeWriter;
     
     JFrame window;
     Container con;
@@ -74,6 +75,8 @@ public class Game
         createRooms();
         parser = new Parser();
         createDisplay();
+        typeWriter = new TypeWriter(0, 1);
+        typeWriter.start();
     }
     
     
@@ -116,14 +119,15 @@ public class Game
     private void createDisplay(){
         display = new Display(800, 600, "button", Color.white, Color.black);
         display.setButtonPanel(300, 400, 200, 100, Color.black);
-        display.setInputPanel(250,350,300,50,Color.blue);
+        display.setInputPanel(250,500,300,50,Color.blue);
         display.setLanguagePanel(10, 10, 50, 100, Color.black);
         display.setMainTextPanel(100,100,600,250,Color.black);
         display.setMainTextArea(100,100,600,250,"test",Color.black,Color.white);
-        display.addButtons(tsHandler, "start", "confirm", "En", "De", "back", Color.black, Color.white);
+        display.addButtons(tsHandler, "start", "↵", "En", "De", "back", Color.black, Color.white);
         
         showScreen(1);
-        printWelcome();
+        display.window.setVisible(true);
+        
     }
     
     /**
@@ -145,6 +149,7 @@ public class Game
                 display.buttonPanel.setVisible(false);
                 display.inputPanel.setVisible(true);
                 display.mainText.setVisible(true);
+                printWelcome();
                 break;
             case 3:
                 //show options
@@ -167,7 +172,8 @@ public class Game
      */
     public void printWelcome()
     {   
-        display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
+        //display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
+        typeWriter.type(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
     }
 
     /**
@@ -183,7 +189,7 @@ public class Game
 
         switch (commandWord) {
             case UNKNOWN:
-                display.mainTextArea.setText(r.getString("unknown"));
+                typeWriter.type(r.getString("unknown"));
                 break;
 
             case HELP:
@@ -216,7 +222,7 @@ public class Game
      */
     private void printHelp() 
     {
-        display.mainTextArea.setText(r.getString("helpText") + parser.showCommands());
+        typeWriter.type(r.getString("helpText") + parser.showCommands());
     }
 
     /** 
@@ -227,7 +233,7 @@ public class Game
     {
         if(!command.hasSecondWord()) {
             // if there is no second word, we don't know where to go...
-            display.mainTextArea.setText(r.getString("goWhere"));
+            typeWriter.type(r.getString("goWhere"));
             return;
         }
 
@@ -241,7 +247,7 @@ public class Game
         else {
             currentRoom = nextRoom;
             roomHistory.add(currentRoom);
-            display.mainTextArea.setText(currentRoom.getLongDescription());         
+            typeWriter.type(currentRoom.getLongDescription());         
         }
     }
     
@@ -251,11 +257,11 @@ public class Game
     private void goBack(){
         if(roomHistory.size() >= 2){
             currentRoom = roomHistory.get(roomHistory.size() - 2);
-            display.mainTextArea.setText(currentRoom.getLongDescription());
+            typeWriter.type(currentRoom.getLongDescription());
             roomHistory.remove(roomHistory.size() - 1);
         }
         else {
-            display.mainTextArea.setText(r.getString("cannotBack"));
+            typeWriter.type(r.getString("cannotBack"));
         }
     }
     
@@ -264,7 +270,7 @@ public class Game
      * Sets the textArea to a description of the current room.
      */
     private void look(){
-        display.mainTextArea.setText(currentRoom.getLongDescription());
+        typeWriter.type(currentRoom.getLongDescription());
     }
     
     /** 
@@ -275,11 +281,11 @@ public class Game
     private boolean quit(Command command) 
     {
         if(command.hasSecondWord()) {
-            display.mainTextArea.setText(r.getString("quitWhat"));
+            typeWriter.type(r.getString("quitWhat"));
             return false;
         }
         else {
-            display.mainTextArea.setText("Just press the X");
+            typeWriter.type("Just press the X");
             return true;  // signal that we want to quit
         }
     }

@@ -1,15 +1,5 @@
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Container;
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
+import java.awt.*;
 /**
  * Write a description of class Display here.
  *
@@ -67,7 +57,7 @@ public class Display
       con.add(languagePanel);
       con.add(buttonPanel);
       con.add(inputPanel);
-      window.setVisible(true);
+      
     }
     
     public void addButton(String title, Color background, Color foreground){
@@ -90,6 +80,7 @@ public class Display
        this.confirmInputButton.setBackground(background);
        this.confirmInputButton.setForeground(foreground);
        this.confirmInputButton.setFont(normalFont);
+       this.confirmInputButton.setPreferredSize(new Dimension(60, 50));
        this.confirmInputButton.addActionListener(tsHandler);
        this.window.getRootPane().setDefaultButton(confirmInputButton);
        
@@ -115,9 +106,9 @@ public class Display
        
        languagePanel.add(language1);
        languagePanel.add(language2);
-       inputPanel.add(backButton);
+       //inputPanel.add(backButton);
        
-       inputPanel.add(confirmInputButton);
+       inputPanel.add(confirmInputButton,"East");
        buttonPanel.add(startButton);
    }
    
@@ -131,6 +122,7 @@ public class Display
         this.mainTextArea.setEditable(false);
         this.mainTextArea.setFont(normalFont);
         this.mainTextArea.setLineWrap(true);
+        this.mainTextArea.setWrapStyleWord(true);
         
         this.mainText.add(mainTextArea);
     }
@@ -153,8 +145,9 @@ public class Display
     public void setInputPanel(int x, int y, int width, int height, Color background){
        this.inputPanel.setBounds(x, y, width, height);
        this.inputPanel.setBackground(background);
-       this.inputPanel.setLayout(new GridLayout(1, 1));
-       this.inputPanel.add(userInput);
+       this.inputPanel.setLayout( new BorderLayout() );
+       this.userInput.setSize(80, 20);
+       this.inputPanel.add(userInput, "Center");
     }
 
     
