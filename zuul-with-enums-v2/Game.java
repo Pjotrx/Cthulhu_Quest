@@ -21,7 +21,10 @@ public class Game
 {
     private Parser parser;
     private Room currentRoom;
-    private ArrayList<Item> inventory;      //.     Items are added in the take item command located below
+    private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
+    private Room outside, theater, pub, lab, office;        //. As stated below at createRooms, the rooms were moved for easier access to them.
+    private Item branch;                                    //. Items are treated the same way as rooms.
+    private int weightCapacity;
         
     /**
      * Create the game and initialise its internal map.
@@ -29,9 +32,10 @@ public class Game
     public Game() 
     {
         createRooms();
-        parser = new Parser();
-        //createItems();          //.   Decided to take another route for this shit
+        parser = new Parser();     
         createInventory();      //.
+        createItems();          //.
+        weightCapacity = 20;    //. This is how much a player can carry in total.
     }
     
     public static void main(String[] args){
@@ -42,10 +46,7 @@ public class Game
     /**
      * Create all the rooms and link their exits together.
      */
-    private void createRooms()
-    {
-        Room outside, theater, pub, lab, office;
-      
+    private void createRooms(){         //. Rooms were moved to the general scope for easier access to them while making items
         // create the rooms
         outside = new Room("outside the main entrance of the university");
         theater = new Room("in a lecture theater");
@@ -70,8 +71,19 @@ public class Game
         currentRoom = outside;  // start game outside
     }
    
+    /**
+     *  Creates a fresh inventory for the player.
+     */
     private void createInventory(){         //.
-        inventory = new ArrayList<>();
+        playerInventory = new ArrayList<>();
+    }
+    
+    /**
+     * Creates all items and puts them in the appropriate rooms.
+     */
+    private void createItems(){             //.
+        branch = new Item("Branch", "An ordinary branch. Why did you pick this up again?", 3);
+        outside.addItem(branch);
     }
     
     /**
@@ -140,6 +152,10 @@ public class Game
             case INVENTORY:             //.
                 printInventory();
                 break;
+                    
+            case DROP:                  //.
+                dropItem(command);
+                break;
         }
         return wantToQuit;
     }
@@ -160,8 +176,11 @@ public class Game
         parser.showCommands();
     }
     
+    /**
+     * Outputs what is currently in the player's inventory.
+     */
     private void printInventory(){
-        for(Item item : inventory){
+        for(Item item : playerInventory){
             System.out.println(item.getName() + ":  " + item.getDescription());
         }
     }
@@ -192,8 +211,22 @@ public class Game
         }
     }
     
-    /*
-     *  Checks if a  
+    /**
+     * Calculates the total weight of the items the player is carrying and returns this.
+     */
+    private int calculateWeight(){
+        int totalWeight = 0;
+        
+        for(Item item: playerInventory){
+            totalWeight = totalWeight + item.getWeight();
+        }
+        
+        return totalWeight;
+    }
+    
+    /**
+     *  First off checks if a second word is entered. After that it calculates the total weight the player is already carrying.
+     *  Then it switches between all the items that can be picked up, if the item cannot be picked up, it displays a message via the default.
      */
     private void takeItem(Command command){       //.
         if(!command.hasSecondWord()){
@@ -202,18 +235,59 @@ public class Game
         }
         
         String itemToTake = command.getSecondWord();
+        int totalWeight = calculateWeight();
         
         switch(itemToTake)
         {
             case "branch":
-                if(currentRoom.getShortDescription() == "outside the main entrance of the university"){
-                    inventory.add(new Item("Branch","An ordinary branch. Why did you pick this up again?"));
-                    System.out.println("You picked up a branch, I guess. What are you gonna do with it, play fetch with yourself? Haha");
+            // TODO: switchen op ints, and thus make a converter that converts the second word to an integer?
+                if(totalWeight + branch.getWeight() < weightCapacity){
+                    if(currentRoom.inventoryContains(branch)){
+                        playerInventory.add(branch);
+                        currentRoom.removeItem(branch);
+                        System.out.println("You picked up a branch, I guess. What are you gonna do with it, play fetch with yourself? Haha");
+                    } else {
+                        System.out.println("I don't see any branches in here, do you dumbass?");
+                    }
                 } else {
-                    System.out.println("I don't see any trees growing in here, do you dumbass?");
+                    System.out.println("It appears to me that you are unable to carry this item. Next time before you wander off, please take a gym class or two, will ya?");
+                    System.out.println("You need to free up at least: " + branch.getWeight());
                 }
                 break;
-            //feel free to add more items here. Convention is to put a Case with the name of the item, and in that case a roomcheck before you add it
+                
+            default:
+                System.out.println("This item cannot be picked up and carried around. Better luck next time, eh?");
+                break;
+        }
+    }
+    
+    /**
+     * Drops the stated item on the floor
+     */
+    private void dropItem(Command command){
+        if(!command.hasSecondWord()){
+            System.out.println("I am starting to believe your mother dropped you as a child. But, that aside, what do you need me to drop?");
+            return;
+        }
+        
+        String itemToDrop = command.getSecondWord();
+        
+        switch(itemToDrop)
+        {
+            case "branch":
+            //TODO: ook dit kan via ints net als bij take.
+                if(playerInventory.contains(branch)){
+                    currentRoom.addItem(branch);
+                    playerInventory.remove(branch);
+                    System.out.println("Thank god you finally stopped carrying that dumb branch around. What did you expect to use that thing for anyway?");
+                } else {
+                    System.out.println("You, my good Sir, are a prime example of mental incompetence. How can you drop something you don't possess?");
+                }
+                break;
+                
+            default:
+                System.out.println("I don't know what you mean...");
+                break;
         }
     }
     

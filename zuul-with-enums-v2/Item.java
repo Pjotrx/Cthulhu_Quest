@@ -9,14 +9,16 @@ public class Item
 {
     private String description;
     private String name;
+    private int weight;
 
     /**
      * Constructor for objects of class Item
      */
-    public Item(String newName, String newDescription)
+    public Item(String newName, String newDescription, int newWeight)
     {
         name = newName;
         description = newDescription;
+        weight = newWeight;
     }
 
     /**
@@ -32,5 +34,12 @@ public class Item
      */
     public String getName(){
         return name;
+    }
+    
+    /**
+     * Returns the weight of said item.
+     */
+    public int getWeight(){
+        return weight;
     }
 }
