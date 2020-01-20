@@ -1,0 +1,13 @@
+#BlueJ class context
+comment0.target=Display
+comment0.text=\n\ Write\ a\ description\ of\ class\ Display\ here.\n\n\ @author\ (your\ name)\n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=
+comment1.target=void\ createStartScreen()
+comment1.text=\n\ Create\ a\ window\ with\ the\ start\ button\ etc\n
+comment2.params=
+comment2.target=void\ creatOptionScreen()
+comment2.text=\n\ Creates\ a\ screen\ to\ display\ settings.\n\ Not\ finished\ or\ even\ functional\n
+comment3.params=
+comment3.target=void\ createGameScreen()
+comment3.text=\n\ Creates\ a\ main\ JTextArea\ to\ display\ descriptions\ and\ instructions.\n\ As\ well\ as\ an\ JTextField\ and\ submit\ button\ for\ user\ input.\n
+numComments=4

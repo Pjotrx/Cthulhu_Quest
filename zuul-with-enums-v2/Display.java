@@ -19,11 +19,11 @@ import java.awt.Color;
 public class Display
 {
    JFrame window;
-   JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
+   JPanel  buttonPanel, titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
    JLabel titleLabel;
-   public static JButton startButton, option1, option2, language1, language2, confirmInputButton;
-   public static JTextArea mainTextArea;
-   public static JTextField userInput;
+   JButton button, startButton, option1, option2, language1, language2, confirmInputButton;
+   JTextArea mainTextArea;
+   JTextField userInput;
    Container con;
    
     Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
@@ -32,11 +32,39 @@ public class Display
     
     
     
-    
+   
+   public Display(int x, int y){
+       this.window = new JFrame();
+       this.window.setSize(x, y);
+       this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly
+       this.window.getContentPane().setBackground(Color.black);
+       this.window.setLayout(null); //set default layout to null
+       
+       this.titlePanel = new JPanel();
+       
+       this.buttonPanel = new JPanel();
+       
+       this.languagePanel = new JPanel();
+       
+       this.con = window.getContentPane();
+       
+       con.add(titlePanel);
+       con.add(buttonPanel);
+       con.add(languagePanel);
+    }
    /**
      * Create a window with the start button etc
      */
-    public void createStartScreen(){
+   
+   public void addButton(String title, Color background, Color foreground){
+        this.button = new JButton(title);
+        this.button.setBackground(background);
+        this.button.setForeground(foreground);
+        this.button.setFont(normalFont);
+        this.button.addActionListener(Game.tsHandler);
+        buttonPanel.add(button);
+   }
+   public void createStartScreen(){
         window = new JFrame();
         window.setSize(800, 600);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly

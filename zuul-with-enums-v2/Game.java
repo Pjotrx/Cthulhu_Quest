@@ -30,7 +30,7 @@ public class Game
     
     
     
-    public static Display display = new Display();
+    public static Display display = new Display(6, 7);
    
     
     public static Locale deutsch = new Locale("ge", "GE");
@@ -83,6 +83,13 @@ public class Game
 
         currentRoom = outside;  // start game outside
         roomHistory.add(currentRoom);
+    }
+    
+    private void createScreens(){
+        Display start, game;
+        
+        
+        
     }
 
     /**
