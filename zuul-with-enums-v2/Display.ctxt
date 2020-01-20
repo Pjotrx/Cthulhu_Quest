@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=Display
+comment0.text=\n\ Write\ a\ description\ of\ class\ Display\ here.\n\n\ @author\ (your\ name)\n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=x\ y\ title\ background\ foreground
+comment1.target=Display(int,\ int,\ java.lang.String,\ java.awt.Color,\ java.awt.Color)
+comment1.text=\n\ Constructor\ for\ objects\ of\ class\ Display\n
+comment2.params=title\ background\ foreground
+comment2.target=void\ addButton(java.lang.String,\ java.awt.Color,\ java.awt.Color)
+comment3.params=tsHandler\ start\ confirmInput\ languageString1\ languageString2\ back\ background\ foreground
+comment3.target=void\ addButtons(Game.TitleScreenHandler,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.lang.String,\ java.awt.Color,\ java.awt.Color)
+comment4.params=x\ y\ width\ height\ text\ background\ foreground
+comment4.target=void\ setMainTextArea(int,\ int,\ int,\ int,\ java.lang.String,\ java.awt.Color,\ java.awt.Color)
+comment5.params=x\ y\ width\ height\ background
+comment5.target=void\ setMainTextPanel(int,\ int,\ int,\ int,\ java.awt.Color)
+comment6.params=x\ y\ width\ height\ background
+comment6.target=void\ setLanguagePanel(int,\ int,\ int,\ int,\ java.awt.Color)
+comment7.params=x\ y\ width\ height\ background
+comment7.target=void\ setButtonPanel(int,\ int,\ int,\ int,\ java.awt.Color)
+comment8.params=x\ y\ width\ height\ background
+comment8.target=void\ setInputPanel(int,\ int,\ int,\ int,\ java.awt.Color)
+numComments=9
