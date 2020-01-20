@@ -19,7 +19,7 @@ public class Display
    
     Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
     Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
-    Font smallFont = new Font("Times New Roman", Font.PLAIN, 12);
+    Font smallFont = new Font("Times New Roman", Font.PLAIN, 18);
     /**
      * Constructor for objects of class Display
      */
@@ -120,7 +120,7 @@ public class Display
         this.mainTextArea.setBackground(background);
         this.mainTextArea.setForeground(foreground);
         this.mainTextArea.setEditable(false);
-        this.mainTextArea.setFont(normalFont);
+        this.mainTextArea.setFont(smallFont);
         this.mainTextArea.setLineWrap(true);
         this.mainTextArea.setWrapStyleWord(true);
         

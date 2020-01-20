@@ -42,6 +42,11 @@ public class Game
     public static Display display;
     public static TypeWriter typeWriter;
     
+    private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
+    private Room foyer, hallway, outside, theater, pub, lab, office;        //. As stated below at createRooms, the rooms were moved for easier access to them.
+    Item branch, item;                                    //. Items are treated the same way as rooms.
+    private int weightCapacity;
+    
     JFrame window;
     Container con;
     JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
@@ -75,8 +80,14 @@ public class Game
         createRooms();
         parser = new Parser();
         createDisplay();
+        
+        createInventory();      //.
+        
+        weightCapacity = 20;    //. This is how much a player can carry in total.
+        
         typeWriter = new TypeWriter(0, 1);
         typeWriter.start();
+        createItems();          //.
     }
     
     
@@ -85,9 +96,11 @@ public class Game
      */
     private void createRooms()
     {
-        Room outside, theater, pub, lab, office;
+        
       
         // create the rooms
+        foyer = new Room(r.getString("foyer"));
+        hallway = new Room(r.getString("hallway"));
         outside = new Room(r.getString("outside"));
         theater = new Room(r.getString("theater"));
         pub = new Room(r.getString("pub"));
@@ -95,6 +108,10 @@ public class Game
         office = new Room(r.getString("office"));
         
         // initialise room exits
+        foyer.setExit(r.getString("north"), hallway);
+        
+        hallway.setExit(r.getString("south"), foyer);
+        
         outside.setExit(r.getString("east"), theater);
         outside.setExit(r.getString("south"), lab);
         outside.setExit(r.getString("west"), pub);
@@ -108,10 +125,24 @@ public class Game
 
         office.setExit(r.getString("west"), lab);
 
-        currentRoom = outside;  // start game outside
+        currentRoom = foyer;  // start game outside
         roomHistory.add(currentRoom);
     }
     
+    /**
+     *  Creates a fresh inventory for the player.
+     */
+    private void createInventory(){         //.
+        playerInventory = new ArrayList<>();
+    }
+    
+    /**
+     * Creates all items and puts them in the appropriate rooms.
+     */
+    private void createItems(){             //.
+        branch = new Item(r.getString("item_branch_name"), r.getString("item_branch_description"), 3);
+        foyer.addItem(branch);
+    }
     
     /**
      * Create all the elements of the display
@@ -121,8 +152,8 @@ public class Game
         display.setButtonPanel(300, 400, 200, 100, Color.black);
         display.setInputPanel(250,500,300,50,Color.blue);
         display.setLanguagePanel(10, 10, 50, 100, Color.black);
-        display.setMainTextPanel(100,100,600,250,Color.black);
-        display.setMainTextArea(100,100,600,250,"test",Color.black,Color.white);
+        display.setMainTextPanel(100,100,600,300,Color.black);
+        display.setMainTextArea(100,100,600,300,"test",Color.black,Color.white);
         display.addButtons(tsHandler, "start", "↵", "En", "De", "back", Color.black, Color.white);
         
         showScreen(1);
@@ -173,7 +204,8 @@ public class Game
     public void printWelcome()
     {   
         //display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
-        typeWriter.type(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
+        typeWriter.type(r.getString("welcome") + "\n\n" + currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());
+        
     }
 
     /**
@@ -211,6 +243,18 @@ public class Game
             case LOOK:
                 look();
                 break;
+                
+            case TAKE:                  //.
+                takeItem(command);
+                break;
+                
+            case INVENTORY:             //.
+                printInventory();
+                break;
+                    
+            case DROP:                  //.
+                dropItem(command);
+                break;
         }
         return wantToQuit;
     }
@@ -225,6 +269,95 @@ public class Game
         typeWriter.type(r.getString("helpText") + parser.showCommands());
     }
 
+    /**
+     * Outputs what is currently in the player's inventory.
+     */
+    private void printInventory(){
+        for(Item item : playerInventory){
+            System.out.println(item.getName() + ":  " + item.getDescription());
+        }
+    }
+    
+    /**
+     * Calculates the total weight of the items the player is carrying and returns this.
+     */
+    private int calculateWeight(){
+        int totalWeight = 0;
+        
+        for(Item item: playerInventory){
+            totalWeight = totalWeight + item.getWeight();
+        }
+        
+        return totalWeight;
+    }
+    
+    /**
+     *  First off checks if a second word is entered. After that it calculates the total weight the player is already carrying.
+     *  Then it switches between all the items that can be picked up, if the item cannot be picked up, it displays a message via the default.
+     */
+    private void takeItem(Command command){       //.
+        if(!command.hasSecondWord()){
+            typeWriter.type(r.getString("take_what"));
+            return;
+        }
+        
+        String itemToTake = command.getSecondWord();
+        int totalWeight = calculateWeight();
+        
+        switch(itemToTake)
+        {
+            case "branch":
+            // TODO: switchen op ints, and thus make a converter that converts the second word to an integer?
+                if(totalWeight + branch.getWeight() < weightCapacity){
+                    if(currentRoom.inventoryContains(branch)){
+                        playerInventory.add(branch);
+                        currentRoom.removeItem(branch);
+                        typeWriter.type(r.getString("item_branch_description"));
+                    } else {
+                        typeWriter.type(r.getString("item_branch_null"));
+                    }
+                } else {
+                    typeWriter.type(r.getString("item_too_heavy"));
+                    typeWriter.type(r.getString("remove_x_weight")  + branch.getWeight());
+                }
+                break;
+                
+            default:
+                typeWriter.type(r.getString("item_no_take"));
+                break;
+        }
+    }
+    
+    /**
+     * Drops the stated item on the floor
+     */
+    private void dropItem(Command command){
+        if(!command.hasSecondWord()){
+            typeWriter.type(r.getString("drop_what"));
+            return;
+        }
+        
+        String itemToDrop = command.getSecondWord();
+        
+        switch(itemToDrop)
+        {
+            case "branch":
+            //TODO: ook dit kan via ints net als bij take.
+                if(playerInventory.contains(branch)){
+                    currentRoom.addItem(branch);
+                    playerInventory.remove(branch);
+                    typeWriter.type(r.getString("item_branch_drop"));
+                } else {
+                    typeWriter.type(r.getString("drop_null_item"));
+                }
+                break;
+                
+            default:
+                typeWriter.type(r.getString("unknown"));
+                break;
+        }
+    }
+    
     /** 
      * Try to go in one direction. If there is an exit, enter the new
      * room, otherwise print an error message.
@@ -247,7 +380,7 @@ public class Game
         else {
             currentRoom = nextRoom;
             roomHistory.add(currentRoom);
-            typeWriter.type(currentRoom.getLongDescription());         
+            typeWriter.type(currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());         
         }
     }
     
@@ -257,7 +390,7 @@ public class Game
     private void goBack(){
         if(roomHistory.size() >= 2){
             currentRoom = roomHistory.get(roomHistory.size() - 2);
-            typeWriter.type(currentRoom.getLongDescription());
+            typeWriter.type(currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());   
             roomHistory.remove(roomHistory.size() - 1);
         }
         else {
@@ -270,7 +403,7 @@ public class Game
      * Sets the textArea to a description of the current room.
      */
     private void look(){
-        typeWriter.type(currentRoom.getLongDescription());
+        typeWriter.type(currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());   
     }
     
     /** 
@@ -285,7 +418,7 @@ public class Game
             return false;
         }
         else {
-            typeWriter.type("Just press the X");
+            typeWriter.type(r.getString("quit"));
             return true;  // signal that we want to quit
         }
     }

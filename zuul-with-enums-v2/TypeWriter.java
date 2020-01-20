@@ -17,7 +17,7 @@ public class TypeWriter
     TimerTask task = new TimerTask(){
         public void run() {
             if(i < string.length()){
-                System.out.println(string.charAt(i));
+                //System.out.println(string.charAt(i));
                 str += String.valueOf(string.charAt(i));  
                 Game.display.mainTextArea.setText(str);
             }
