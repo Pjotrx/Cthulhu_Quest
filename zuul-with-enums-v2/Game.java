@@ -44,7 +44,7 @@ public class Game
     
     private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
     private Room foyer, hallway, outside, theater, pub, lab, office;        //. As stated below at createRooms, the rooms were moved for easier access to them.
-    Item branch, steroids, item;                                    //. Items are treated the same way as rooms.
+    Item branch, steroids, purpleKey, redKey, blueKey;                                    //. Items are treated the same way as rooms.
     private int weightCapacity;
     
     JFrame window;
@@ -145,6 +145,15 @@ public class Game
         
         steroids = new Item(r.getString("item_steroids_name"), r.getString("item_steroids_description"), 1);
         foyer.addItem(steroids);
+        
+        purpleKey = new Item(r.getString("item_purpleKey_name"), r.getString("item_purpleKey_description"), 2);
+        foyer.addItem(purpleKey);
+        
+        redKey = new Item(r.getString("item_redKey_name"), r.getString("item_redKey_description"), 2);
+        foyer.addItem(redKey);
+        
+        blueKey = new Item(r.getString("item_blueKey_name"), r.getString("item_blueKey_description"), 2);
+        foyer.addItem(blueKey);
     }
     
     /**
@@ -208,7 +217,6 @@ public class Game
     {   
         //display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
         typeWriter.type(r.getString("welcome") + "\n\n" + currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());
-        
     }
 
     /**
@@ -310,7 +318,7 @@ public class Game
             typeWriter.type(r.getString("take_what"));
             return;
         }
-        
+
         String itemToTake = command.getSecondWord();
         int totalWeight = calculateWeight();
         
@@ -345,6 +353,27 @@ public class Game
                     typeWriter.type(r.getString("item_too heavy"));
                     typeWriter.type(r.getString("remove_x_weight")  + steroids.getWeight());
                 }
+                break;
+                
+            case "key":
+                if(totalWeight + purpleKey.getWeight() <= weightCapacity){
+                    if(currentRoom.inventoryContains(purpleKey)){
+                        playerInventory.add(purpleKey);
+                        currentRoom.removeItem(purpleKey);
+                    } else if(currentRoom.inventoryContains(redKey)) {
+                        playerInventory.add(redKey);
+                        currentRoom.removeItem(redKey);
+                    } else if(currentRoom.inventoryContains(blueKey)) {
+                        playerInventory.add(blueKey);
+                        currentRoom.removeItem(blueKey);
+                    } else {
+                        typeWriter.type(r.getString("item_key_null"));
+                    }
+                } else {
+                    typeWriter.type(r.getString("item_too heavy"));
+                    typeWriter.type(r.getString("remove_x_weight")  + purpleKey.getWeight());
+                }
+                typeWriter.type(r.getString("taken_item_key"));
                 break;
                 
             default:
