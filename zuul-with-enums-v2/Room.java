@@ -1,28 +1,30 @@
-import java.util.Set;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ArrayList;
-
-/**
- * Class Room - a room in an adventure game.
- *
- * This class is part of the "World of Zuul" application. 
- * "World of Zuul" is a very simple, text based adventure game.  
- *
- * A "Room" represents one location in the scenery of the game.  It is 
- * connected to other rooms via exits.  For each existing exit, the room 
- * stores a reference to the neighboring room.
- * 
- * @author  Michael Kölling and David J. Barnes
- * @version 2016.02.29
- */
-
-public class Room 
-{
+    import java.util.Set;
+    import java.util.HashMap;
+    import java.util.Iterator;
+    import java.util.ArrayList;
+    
+    /**
+     * Class Room - a room in an adventure game.
+     *
+     * This class is part of the "World of Zuul" application. 
+     * "World of Zuul" is a very simple, text based adventure game.  
+     *
+     * A "Room" represents one location in the scenery of the game.  It is 
+     * connected to other rooms via exits.  For each existing exit, the room 
+     * stores a reference to the neighboring room.
+     * 
+     * @author  Michael Kölling and David J. Barnes
+     * @version 2016.02.29
+     */
+    
+    public class Room 
+    {
     private String description;
     private HashMap<String, Room> exits;        // stores exits of this room.
     private ArrayList<Item> roomInventory;      // stores the items that are located in this room.
-
+    private boolean locked;                      // stores whether the room is locked or not at this stage.
+    private String colour;                       // stores which color key is needed.
+    
     /**
      * Create a room described "description". Initially, it has
      * no exits. "description" is something like "a kitchen" or
@@ -34,6 +36,8 @@ public class Room
         this.description = description;
         exits = new HashMap<>();
         roomInventory = new ArrayList<>();
+        locked = false;                         //Every room starts unlocked. If you want one locked, use setLock.
+        colour = "";                            //Just like the lock, every room has no colour for the lock.
     }
 
     /**
@@ -114,6 +118,26 @@ public class Room
         } else {
             return false;
         }
+    }
+    
+    public void setLocked(){
+        locked = true;
+    }
+    
+    public void setUnlocked(){
+        locked = false;
+    }
+    
+    public boolean getLocked(){
+        return locked;
+    }
+    
+    public String getColour(){
+        return colour;
+    }
+    
+    public void setColour(String newColour){
+        colour = newColour;
     }
 }
 
