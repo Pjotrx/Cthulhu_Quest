@@ -152,9 +152,13 @@ public class Game
         display.setButtonPanel(300, 400, 200, 100, Color.black);
         display.setInputPanel(250,500,300,50,Color.blue);
         display.setLanguagePanel(10, 10, 50, 100, Color.black);
+        
+        display.setTitlePanel(100,100,600,300,Color.black);
+        display.setTitleArea(100,100,600,300,"C̶͉͉͆̈ẗ̶͓̤̓̐̚͝ẖ̴̀͝u̴͌̆̄ͅl̵̢̡̒h̷̢̛̛͔̀̈́͠ǘ̷̢̨͚͍́̈͊̆ ̷̬̓͗́̇Q̴̗̰̖͈̟͊͝û̷͔̝̗̫͗͝͝è̵̺s̶̰͒̀̔ṭ̴̡͊",Color.black,Color.white);
+        //display.setTitleLabel("C̶͉͉͆̈ẗ̶͓̤̓̐̚͝ẖ̴̀͝u̴͌̆̄ͅl̵̢̡̒h̷̢̛̛͔̀̈́͠ǘ̷̢̨͚͍́̈͊̆ ̷̬̓͗́̇Q̴̗̰̖͈̟͊͝û̷͔̝̗̫͗͝͝è̵̺s̶̰͒̀̔ṭ̴̡̞̝͊");
         display.setMainTextPanel(100,100,600,300,Color.black);
         display.setMainTextArea(100,100,600,300,"test",Color.black,Color.white);
-        display.addButtons(tsHandler, "start", "↵", "En", "De", "back", Color.black, Color.white);
+        display.addButtons(tsHandler, "start", "↵", "back", Color.black, Color.white);
         
         showScreen(1);
         display.window.setVisible(true);
@@ -174,6 +178,7 @@ public class Game
                 display.inputPanel.setVisible(false);
                 display.mainText.setVisible(false);
                 display.buttonPanel.setVisible(true);
+                display.titlePanel.setVisible(true);
                 break;
             case 2:
                 

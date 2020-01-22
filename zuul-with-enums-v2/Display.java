@@ -1,5 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.net.URL;
+
 /**
  * Write a description of class Display here.
  *
@@ -13,9 +18,17 @@ public class Display
    JPanel  buttonPanel, titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
    JLabel titleLabel;
    JButton button, startButton, option1, option2, language1, language2, confirmInputButton, backButton;
-   JTextArea mainTextArea;
+   JTextArea mainTextArea, titleArea;
    JTextField userInput;
    Container con;
+   
+   URL ge_flag = Game.class.getResource("images/ge_flag.png");
+   URL ge_flag_pressed = Game.class.getResource("images/ge_flag_pressed.png");
+   URL ge_flag_hover = Game.class.getResource("images/ge_flag_hover.png");
+   
+   URL en_flag = Game.class.getResource("images/en_flag.png");
+   URL en_flag_pressed = Game.class.getResource("images/en_flag_pressed.png");
+   URL en_flag_hover = Game.class.getResource("images/en_flag_hover.png");
    
     Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
     Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
@@ -33,6 +46,8 @@ public class Display
        
        this.titlePanel = new JPanel();
        
+       this.titleArea = new JTextArea();
+       
        this.buttonPanel = new JPanel();
        
        this.mainText = new JPanel();
@@ -47,9 +62,9 @@ public class Display
        
        this.con = window.getContentPane();
        
+      //titlePanel.add(titleLabel);
       
-      
-      
+      this.titlePanel.add(titleArea);
       con.add(mainText);
       
       con.add(titlePanel);
@@ -69,7 +84,9 @@ public class Display
         buttonPanel.add(button);
    }
    
-   public void addButtons(Game.TitleScreenHandler tsHandler, String start, String confirmInput, String languageString1, String languageString2, String back, Color background, Color foreground){
+   
+   
+   public void addButtons(Game.TitleScreenHandler tsHandler, String start, String confirmInput, String back, Color background, Color foreground){
        this.startButton = new JButton(start);
        this.startButton.setBackground(background);
        this.startButton.setForeground(foreground);
@@ -84,13 +101,39 @@ public class Display
        this.confirmInputButton.addActionListener(tsHandler);
        this.window.getRootPane().setDefaultButton(confirmInputButton);
        
-       this.language1 = new JButton(languageString1);
+       //this.language1 = new JButton(languageString1);
+       this.language1 = new JButton();
+
+       if (en_flag != null && en_flag_pressed != null && en_flag_hover != null) {
+           ImageIcon icon_en = new ImageIcon(en_flag);
+           ImageIcon icon_pressed_en = new ImageIcon(en_flag_pressed);
+           ImageIcon icon_hover_en = new ImageIcon(en_flag_hover);
+           language1.setIcon(icon_en);
+           language1.setRolloverIcon(icon_hover_en);
+           language1.setPressedIcon(icon_pressed_en);
+        }
+        else{System.out.println("image not found");}
+       this.language1.setBorder(BorderFactory.createEmptyBorder());
+       this.language1.setContentAreaFilled(false);
+       
+        
        this.language1.setBackground(background);
        this.language1.setForeground(foreground);
        this.language1.setFont(normalFont);
        this.language1.addActionListener(tsHandler);
        
-       this.language2 = new JButton(languageString2);
+       this.language2 = new JButton();
+       if (ge_flag != null && ge_flag_pressed != null && ge_flag_hover != null) {
+           ImageIcon icon_ge = new ImageIcon(ge_flag);
+           ImageIcon icon_pressed_ge = new ImageIcon(ge_flag_pressed);
+           ImageIcon icon_hover_ge = new ImageIcon(ge_flag_hover);
+           language2.setIcon(icon_ge);
+           language2.setRolloverIcon(icon_hover_ge);
+           language2.setPressedIcon(icon_pressed_ge);
+        }
+        else{System.out.println("image not found");}
+        this.language2.setBorder(BorderFactory.createEmptyBorder());
+       this.language2.setContentAreaFilled(false);
        this.language2.setBackground(background);
        this.language2.setForeground(foreground);
        this.language2.setFont(normalFont);
@@ -127,6 +170,19 @@ public class Display
         this.mainText.add(mainTextArea);
     }
     
+    public void setTitleArea(int x, int y, int width, int height, String text, Color background, Color foreground){
+        this.titleArea = new JTextArea(text);
+        this.titleArea.setBounds(x, y, width, height);
+        this.titleArea.setBackground(background);
+        this.titleArea.setForeground(foreground);
+        this.titleArea.setEditable(false);
+        this.titleArea.setFont(titleFont);
+        this.titleArea.setLineWrap(true);
+        this.titleArea.setWrapStyleWord(true);
+        
+        this.titlePanel.add(titleArea);
+    }
+    
     public void setMainTextPanel(int x, int y, int width, int height, Color background){
         this.mainText.setBounds(x, y, width, height);
         this.mainText.setBackground(background);
@@ -140,6 +196,13 @@ public class Display
     public void setButtonPanel(int x, int y, int width, int height, Color background){
        this.buttonPanel.setBounds(x, y, width, height);
        this.buttonPanel.setBackground(background);
+    }
+    
+    
+    
+    public void setTitlePanel(int x, int y, int width, int height, Color background){
+       this.titlePanel.setBounds(x, y, width, height);
+       this.titlePanel.setBackground(background);
     }
     
     public void setInputPanel(int x, int y, int width, int height, Color background){
