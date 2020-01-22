@@ -44,7 +44,7 @@ public class Game
     
     private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
     private Room foyer, hallway, outside, theater, pub, lab, office;        //. As stated below at createRooms, the rooms were moved for easier access to them.
-    Item branch, item;                                    //. Items are treated the same way as rooms.
+    Item branch, steroids, item;                                    //. Items are treated the same way as rooms.
     private int weightCapacity;
     
     JFrame window;
@@ -83,7 +83,7 @@ public class Game
         
         createInventory();      //.
         
-        weightCapacity = 20;    //. This is how much a player can carry in total.
+        weightCapacity = 1;    //. This is how much a player can carry in total.
         
         typeWriter = new TypeWriter(0, 1);
         typeWriter.start();
@@ -142,6 +142,9 @@ public class Game
     private void createItems(){             //.
         branch = new Item(r.getString("item_branch_name"), r.getString("item_branch_description"), 3);
         foyer.addItem(branch);
+        
+        steroids = new Item(r.getString("item_steroids_name"), r.getString("item_steroids_description"), 1);
+        foyer.addItem(steroids);
     }
     
     /**
@@ -255,6 +258,10 @@ public class Game
             case DROP:                  //.
                 dropItem(command);
                 break;
+                
+            case USE:                   //..
+                useItem(command);
+                break;
         }
         return wantToQuit;
     }
@@ -273,9 +280,12 @@ public class Game
      * Outputs what is currently in the player's inventory.
      */
     private void printInventory(){
+        String output = "";
         for(Item item : playerInventory){
-            System.out.println(item.getName() + ":  " + item.getDescription());
+            //System.out.println(item.getName() + ":  " + item.getDescription());
+            output += item.getName() + ": " + item.getDescription() + "\n";
         }
+        typeWriter.type(output);
     }
     
     /**
@@ -308,7 +318,7 @@ public class Game
         {
             case "branch":
             // TODO: switchen op ints, and thus make a converter that converts the second word to an integer?
-                if(totalWeight + branch.getWeight() < weightCapacity){
+                if(totalWeight + branch.getWeight() <= weightCapacity){
                     if(currentRoom.inventoryContains(branch)){
                         playerInventory.add(branch);
                         currentRoom.removeItem(branch);
@@ -319,6 +329,21 @@ public class Game
                 } else {
                     typeWriter.type(r.getString("item_too_heavy"));
                     typeWriter.type(r.getString("remove_x_weight")  + branch.getWeight());
+                }
+                break;
+                
+            case "steroids":
+                if(totalWeight + steroids.getWeight() <= weightCapacity){
+                    if(currentRoom.inventoryContains(steroids)){
+                        playerInventory.add(steroids);
+                        currentRoom.removeItem(steroids);
+                        typeWriter.type(r.getString("taken_item_steroids"));
+                    } else {
+                        typeWriter.type(r.getString("item_steroids_null"));
+                    }
+                } else {
+                    typeWriter.type(r.getString("item_too heavy"));
+                    typeWriter.type(r.getString("remove_x_weight")  + steroids.getWeight());
                 }
                 break;
                 
@@ -355,6 +380,31 @@ public class Game
             default:
                 typeWriter.type(r.getString("unknown"));
                 break;
+        }
+    }
+    
+    /**
+     * Uses an item and destroys it in the process.
+     */
+    private void useItem(Command command){  //..
+        if(!command.hasSecondWord()){
+            typeWriter.type(r.getString("use_what?"));
+            return;
+        }
+        
+        String itemToUse = command.getSecondWord();
+        
+        switch(itemToUse)
+        {
+            case "steroids":
+                if(playerInventory.contains(steroids)){
+                    weightCapacity = 30;
+                    typeWriter.type(r.getString("used_item_steroids"));
+                }
+                break;
+            
+            default:
+                typeWriter.type(r.getString("unknown"));
         }
     }
     
