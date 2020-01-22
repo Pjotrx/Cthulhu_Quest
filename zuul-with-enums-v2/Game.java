@@ -44,7 +44,7 @@ public class Game
     
     private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
     private Room foyer, hallway, outside, theater, pub, lab, office;        //. As stated below at createRooms, the rooms were moved for easier access to them.
-    Item branch, item;                                    //. Items are treated the same way as rooms.
+    Item branch, steroids, purpleKey, redKey, blueKey;                                    //. Items are treated the same way as rooms.
     private int weightCapacity;
     
     JFrame window;
@@ -83,7 +83,7 @@ public class Game
         
         createInventory();      //.
         
-        weightCapacity = 20;    //. This is how much a player can carry in total.
+        weightCapacity = 1;    //. This is how much a player can carry in total.
         
         typeWriter = new TypeWriter(0, 1);
         typeWriter.start();
@@ -124,8 +124,12 @@ public class Game
         lab.setExit(r.getString("east"), office);
 
         office.setExit(r.getString("west"), lab);
+        
+        //lock the appropriate rooms at the start of the game.
+        hallway.setLocked();
+        hallway.setColour("purple");
 
-        currentRoom = foyer;  // start game outside
+        currentRoom = foyer;  // start game in foyer.
         roomHistory.add(currentRoom);
     }
     
@@ -142,6 +146,18 @@ public class Game
     private void createItems(){             //.
         branch = new Item(r.getString("item_branch_name"), r.getString("item_branch_description"), 3);
         foyer.addItem(branch);
+        
+        steroids = new Item(r.getString("item_steroids_name"), r.getString("item_steroids_description"), 1);
+        foyer.addItem(steroids);
+        
+        purpleKey = new Item(r.getString("item_purpleKey_name"), r.getString("item_purpleKey_description"), 2);
+        foyer.addItem(purpleKey);
+        
+        redKey = new Item(r.getString("item_redKey_name"), r.getString("item_redKey_description"), 2);
+        foyer.addItem(redKey);
+        
+        blueKey = new Item(r.getString("item_blueKey_name"), r.getString("item_blueKey_description"), 2);
+        foyer.addItem(blueKey);
     }
     
     /**
@@ -205,7 +221,6 @@ public class Game
     {   
         //display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
         typeWriter.type(r.getString("welcome") + "\n\n" + currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());
-        
     }
 
     /**
@@ -255,6 +270,10 @@ public class Game
             case DROP:                  //.
                 dropItem(command);
                 break;
+                
+            case USE:                   //..
+                useItem(command);
+                break;
         }
         return wantToQuit;
     }
@@ -272,9 +291,16 @@ public class Game
     /**
      * Outputs what is currently in the player's inventory.
      */
-    private void printInventory(){
-        for(Item item : playerInventory){
-            System.out.println(item.getName() + ":  " + item.getDescription());
+    private void printInventory(){      //..
+        String output = "";
+        if(playerInventory.isEmpty()){
+            typeWriter.type(r.getString("inventory_empty"));
+        }  else {
+            for(Item item : playerInventory){
+                //System.out.println(item.getName() + ":  " + item.getDescription());
+                output += item.getName() + ": " + item.getDescription() + "\n";
+            }
+            typeWriter.type(output);
         }
     }
     
@@ -295,20 +321,20 @@ public class Game
      *  First off checks if a second word is entered. After that it calculates the total weight the player is already carrying.
      *  Then it switches between all the items that can be picked up, if the item cannot be picked up, it displays a message via the default.
      */
-    private void takeItem(Command command){       //.
+    private void takeItem(Command command){       //..
         if(!command.hasSecondWord()){
             typeWriter.type(r.getString("take_what"));
             return;
         }
-        
+
         String itemToTake = command.getSecondWord();
         int totalWeight = calculateWeight();
         
         switch(itemToTake)
         {
             case "branch":
-            // TODO: switchen op ints, and thus make a converter that converts the second word to an integer?
-                if(totalWeight + branch.getWeight() < weightCapacity){
+            // TODO: switchen op constants that are set in the resource bundles.
+                if(totalWeight + branch.getWeight() <= weightCapacity){
                     if(currentRoom.inventoryContains(branch)){
                         playerInventory.add(branch);
                         currentRoom.removeItem(branch);
@@ -319,6 +345,44 @@ public class Game
                 } else {
                     typeWriter.type(r.getString("item_too_heavy"));
                     typeWriter.type(r.getString("remove_x_weight")  + branch.getWeight());
+                }
+                break;
+                
+            case "steroids":
+                if(totalWeight + steroids.getWeight() <= weightCapacity){
+                    if(currentRoom.inventoryContains(steroids)){
+                        playerInventory.add(steroids);
+                        currentRoom.removeItem(steroids);
+                        typeWriter.type(r.getString("taken_item_steroids"));
+                    } else {
+                        typeWriter.type(r.getString("item_steroids_null"));
+                    }
+                } else {
+                    typeWriter.type(r.getString("item_too heavy"));
+                    typeWriter.type(r.getString("remove_x_weight")  + steroids.getWeight());
+                }
+                break;
+                
+            case "key":
+                if(totalWeight + purpleKey.getWeight() <= weightCapacity){
+                    if(currentRoom.inventoryContains(purpleKey)){
+                        playerInventory.add(purpleKey);
+                        currentRoom.removeItem(purpleKey);
+                        typeWriter.type(r.getString("taken_item_key"));
+                    } else if(currentRoom.inventoryContains(redKey)) {
+                        playerInventory.add(redKey);
+                        currentRoom.removeItem(redKey);
+                        typeWriter.type(r.getString("taken_item_redKey"));
+                    } else if(currentRoom.inventoryContains(blueKey)) {
+                        playerInventory.add(blueKey);
+                        currentRoom.removeItem(blueKey);
+                        typeWriter.type(r.getString("taken_item_key"));
+                    } else {
+                        typeWriter.type(r.getString("item_key_null"));
+                    }
+                } else {
+                    typeWriter.type(r.getString("item_too heavy"));
+                    typeWriter.type(r.getString("remove_x_weight")  + purpleKey.getWeight());
                 }
                 break;
                 
@@ -358,6 +422,32 @@ public class Game
         }
     }
     
+    /**
+     * Uses an item and destroys it in the process.
+     */
+    private void useItem(Command command){  //..
+        if(!command.hasSecondWord()){
+            typeWriter.type(r.getString("use_what?"));
+            return;
+        }
+        
+        String itemToUse = command.getSecondWord();
+        
+        switch(itemToUse)
+        {
+            case "steroids":
+                if(playerInventory.contains(steroids)){
+                    weightCapacity = 30;
+                    playerInventory.remove(steroids);
+                    typeWriter.type(r.getString("used_item_steroids"));
+                }
+                break;
+            
+            default:
+                typeWriter.type(r.getString("unknown"));
+        }
+    }
+    
     /** 
      * Try to go in one direction. If there is an exit, enter the new
      * room, otherwise print an error message.
@@ -373,14 +463,33 @@ public class Game
         String direction = command.getSecondWord();
          // Try to leave current room.
         Room nextRoom = currentRoom.getExit(direction);
-
+        
+        //..
         if (nextRoom == null) {
             display.mainTextArea.append("\n" + r.getString("noDoor"));
-        }
-        else {
-            currentRoom = nextRoom;
-            roomHistory.add(currentRoom);
-            typeWriter.type(currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());         
+        } else {
+            if(nextRoom.getLocked()){
+                String colour = nextRoom.getColour();
+                if(colour == "purple" && playerInventory.contains(purpleKey)){
+                    nextRoom.setUnlocked();
+                    playerInventory.remove(purpleKey);
+                    typeWriter.type(r.getString("door_unlocked"));
+                } else if(colour == "red" && playerInventory.contains(redKey)){
+                    nextRoom.setUnlocked();
+                    playerInventory.remove(redKey);
+                    typeWriter.type(r.getString("door_unlocked"));
+                } else if(colour == "blue" && playerInventory.contains(blueKey)){
+                    nextRoom.setUnlocked();
+                    playerInventory.remove(blueKey);
+                    typeWriter.type(r.getString("door_unlocked"));
+                } else {
+                    typeWriter.type(r.getString("no_key"));
+                }
+            } else {
+                currentRoom = nextRoom;
+                roomHistory.add(currentRoom);
+                typeWriter.type(currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());         
+            }   
         }
     }
     
@@ -422,8 +531,7 @@ public class Game
             return true;  // signal that we want to quit
         }
     }
-    
-  
+         
     /**
      * 
      */
