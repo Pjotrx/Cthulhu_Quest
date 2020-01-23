@@ -32,8 +32,7 @@ public class TypeWriter
     /**
      * Constructor for objects of class TypeWriter
      */
-    public TypeWriter(int i, int waitTime)
-    {
+    public TypeWriter(int i, int waitTime){
          this.myTimer = new Timer();
          this.string = "";
          this.i = i;
@@ -41,11 +40,9 @@ public class TypeWriter
     }
     
     public void type(String string){
-        
         this.i = 0;
         this.string = string;
         str = "";
-        //Game.display.mainTextArea.setText(str);
     }
 
     

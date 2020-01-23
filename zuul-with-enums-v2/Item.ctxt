@@ -1,16 +1,16 @@
 #BlueJ class context
 comment0.target=Item
-comment0.text=\r\n\ The\ item\ class\ only\ contains\ the\ description\ of\ a\ given\ item\ for\ now.\r\n\r\n\ @author\ Sjoerd\ Jr\ Helmhout\r\n\ @version\ 12-01-2020\r\n
+comment0.text=\n\ The\ item\ class\ only\ contains\ the\ description\ of\ a\ given\ item\ for\ now.\n\n\ @author\ Sjoerd\ Jr\ Helmhout\n\ @version\ 12-01-2020\n
 comment1.params=newName\ newDescription\ newWeight
 comment1.target=Item(java.lang.String,\ java.lang.String,\ int)
-comment1.text=\r\n\ Constructor\ for\ objects\ of\ class\ Item\r\n
+comment1.text=\n\ Constructor\ for\ objects\ of\ class\ Item\n
 comment2.params=
 comment2.target=java.lang.String\ getDescription()
-comment2.text=\r\n\ Returns\ the\ description\ of\ said\ item\r\n
+comment2.text=\n\ Returns\ the\ description\ of\ said\ item\n
 comment3.params=
 comment3.target=java.lang.String\ getName()
-comment3.text=\r\n\ Returns\ the\ name\ of\ said\ item.\r\n
+comment3.text=\n\ Returns\ the\ name\ of\ said\ item.\n
 comment4.params=
 comment4.target=int\ getWeight()
-comment4.text=\r\n\ Returns\ the\ weight\ of\ said\ item.\r\n
+comment4.text=\n\ Returns\ the\ weight\ of\ said\ item.\n
 numComments=5

@@ -1,15 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.net.URL;
 /**
- * Write a description of class Display here.
+ * The Display class provides methods for creating the graphical user interface
  *
  * @author (your name)
  * @version (a version number or a date)
  */
 public class Display
 {
-    // instance variables - replace the example below with your own
-     JFrame window;
+   JFrame window;
    JPanel  buttonPanel, titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
    JLabel titleLabel;
    JButton button, startButton, option1, option2, language1, language2, confirmInputButton, backButton;
@@ -17,39 +20,37 @@ public class Display
    JTextField userInput;
    Container con;
    
-    Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
-    Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
-    Font smallFont = new Font("Times New Roman", Font.PLAIN, 18);
+    URL ge_flag = Game.class.getResource("images/ge_flag.png");
+   URL ge_flag_pressed = Game.class.getResource("images/ge_flag_pressed.png");
+   URL ge_flag_hover = Game.class.getResource("images/ge_flag_hover.png");
+   
+   URL en_flag = Game.class.getResource("images/en_flag.png");
+   URL en_flag_pressed = Game.class.getResource("images/en_flag_pressed.png");
+   URL en_flag_hover = Game.class.getResource("images/en_flag_hover.png");
+   
+   Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
+   Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
+   Font smallFont = new Font("Times New Roman", Font.PLAIN, 18);
     /**
      * Constructor for objects of class Display
      */
-    public Display(int x, int y, String title, Color background, Color foreground){
-       this.window = new JFrame();
-       this.window.setSize(x, y);
-       this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly
-       this.window.getContentPane().setBackground(Color.black);
-       this.window.setLayout(null); //set default layout to null
+   public Display(int x, int y, String title, Color background, Color foreground){
+      this.window = new JFrame();
+      this.window.setSize(x, y);
+      this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly
+      this.window.getContentPane().setBackground(Color.black);
+      this.window.setLayout(null); 
        
        
-       this.titlePanel = new JPanel();
-       
-       this.buttonPanel = new JPanel();
-       
-       this.mainText = new JPanel();
-       
-       this.mainTextArea = new JTextArea();
-       
-       this.inputPanel = new JPanel();
-       
-       this.userInput = new JTextField("");
-       
-       this.languagePanel = new JPanel();
-       
-       this.con = window.getContentPane();
-       
-      
-      
-      
+      this.titlePanel = new JPanel();
+      this.buttonPanel = new JPanel();       
+      this.mainText = new JPanel(); 
+      this.mainTextArea = new JTextArea();       
+      this.inputPanel = new JPanel();       
+      this.userInput = new JTextField("");       
+      this.languagePanel = new JPanel();
+      this.con = window.getContentPane();
+
       con.add(mainText);
       
       con.add(titlePanel);
@@ -58,17 +59,11 @@ public class Display
       con.add(buttonPanel);
       con.add(inputPanel);
       
-    }
-    
-    public void addButton(String title, Color background, Color foreground){
-        this.button = new JButton(title);
-        this.button.setBackground(background);
-        this.button.setForeground(foreground);
-        this.button.setFont(normalFont);
-        //this.button.addActionListener(Game.tsHandler);
-        buttonPanel.add(button);
    }
    
+   /**
+   * Create and add the buttons to the display
+   */
    public void addButtons(Game.TitleScreenHandler tsHandler, String start, String confirmInput, String languageString1, String languageString2, String back, Color background, Color foreground){
        this.startButton = new JButton(start);
        this.startButton.setBackground(background);
@@ -84,13 +79,38 @@ public class Display
        this.confirmInputButton.addActionListener(tsHandler);
        this.window.getRootPane().setDefaultButton(confirmInputButton);
        
-       this.language1 = new JButton(languageString1);
+        this.language1 = new JButton();
+
+       if (en_flag != null && en_flag_pressed != null && en_flag_hover != null) {
+           ImageIcon icon_en = new ImageIcon(en_flag);
+           ImageIcon icon_pressed_en = new ImageIcon(en_flag_pressed);
+           ImageIcon icon_hover_en = new ImageIcon(en_flag_hover);
+           language1.setIcon(icon_en);
+           language1.setRolloverIcon(icon_hover_en);
+           language1.setPressedIcon(icon_pressed_en);
+        }
+        else{System.out.println("image not found");}
+       this.language1.setBorder(BorderFactory.createEmptyBorder());
+       this.language1.setContentAreaFilled(false);
+       
+        
        this.language1.setBackground(background);
        this.language1.setForeground(foreground);
        this.language1.setFont(normalFont);
        this.language1.addActionListener(tsHandler);
        
-       this.language2 = new JButton(languageString2);
+       this.language2 = new JButton();
+       if (ge_flag != null && ge_flag_pressed != null && ge_flag_hover != null) {
+           ImageIcon icon_ge = new ImageIcon(ge_flag);
+           ImageIcon icon_pressed_ge = new ImageIcon(ge_flag_pressed);
+           ImageIcon icon_hover_ge = new ImageIcon(ge_flag_hover);
+           language2.setIcon(icon_ge);
+           language2.setRolloverIcon(icon_hover_ge);
+           language2.setPressedIcon(icon_pressed_ge);
+        }
+        else{System.out.println("image not found");}
+        this.language2.setBorder(BorderFactory.createEmptyBorder());
+       this.language2.setContentAreaFilled(false);
        this.language2.setBackground(background);
        this.language2.setForeground(foreground);
        this.language2.setFont(normalFont);

@@ -1,9 +1,6 @@
 import java.util.HashMap;
 
 /**
- * This class is part of the "World of Zuul" application. 
- * "World of Zuul" is a very simple, text based adventure game.
- * 
  * This class holds an enumeration of all command words known to the game.
  * It is used to recognise commands as they are typed in.
  *
@@ -34,11 +31,12 @@ public class CommandWords
     }
 
     public static void resetEnum(Locale locale){
+        validCommands.clear();
         Game.r = ResourceBundle.getBundle("Bundle", locale);
         for(CommandWord command : CommandWord.values()) {
             if(command != CommandWord.UNKNOWN) {
                 validCommands.put(Game.r.getString(command.toString()), command);
-                System.out.println(Game.r.getString(command.toString()));
+                //System.out.println(Game.r.getString(command.toString()));
             }
         }
       

@@ -43,7 +43,7 @@ public class Game
     public static TypeWriter typeWriter;
     
     private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
-    private Room foyer, hallway, outside, theater, pub, lab, office;        //. As stated below at createRooms, the rooms were moved for easier access to them.
+    private Room foyer, hallway, reading_room, congierge_office, engine_room, long_hall, front_yard;       //. As stated below at createRooms, the rooms were moved for easier access to them.
     Item branch, steroids, purpleKey, redKey, blueKey;                                    //. Items are treated the same way as rooms.
     private int weightCapacity;
     
@@ -101,36 +101,50 @@ public class Game
         // create the rooms
         foyer = new Room(r.getString("foyer"));
         hallway = new Room(r.getString("hallway"));
-        outside = new Room(r.getString("outside"));
-        theater = new Room(r.getString("theater"));
-        pub = new Room(r.getString("pub"));
-        lab = new Room(r.getString("lab"));
-        office = new Room(r.getString("office"));
+        reading_room = new Room(r.getString("reading_room"));
+        congierge_office = new Room(r.getString("congierge_office"));
+        engine_room = new Room(r.getString("engine_room"));
+        long_hall = new Room(r.getString("long_hall"));
+        front_yard = new Room(r.getString("front_yard"));
         
         // initialise room exits
         foyer.setExit(r.getString("north"), hallway);
+        foyer.setExit(r.getString("south"), front_yard);
+        
+        front_yard.setExit(r.getString("north"), foyer);
         
         hallway.setExit(r.getString("south"), foyer);
+        hallway.setExit(r.getString("west"), congierge_office);
+        hallway.setExit(r.getString("east"), reading_room);
+        hallway.setExit(r.getString("north"), long_hall);
         
-        outside.setExit(r.getString("east"), theater);
-        outside.setExit(r.getString("south"), lab);
-        outside.setExit(r.getString("west"), pub);
+        reading_room.setExit(r.getString("west"), hallway);
+        
+        congierge_office.setExit(r.getString("east"), hallway);
+        congierge_office.setExit(r.getString("west"), engine_room);
+        
+        engine_room.setExit(r.getString("east"), congierge_office);
+        
+        long_hall.setExit(r.getString("south"), hallway);
+        
+        
+        
 
-        theater.setExit(r.getString("west"), outside);
+        
 
-        pub.setExit(r.getString("east"), outside);
-
-        lab.setExit(r.getString("north"), outside);
-        lab.setExit(r.getString("east"), office);
-
-        office.setExit(r.getString("west"), lab);
         
         //lock the appropriate rooms at the start of the game.
-        hallway.setLocked();
-        hallway.setColour("purple");
-
-        currentRoom = foyer;  // start game in foyer.
-        roomHistory.add(currentRoom);
+        front_yard.setLocked();
+        front_yard.setColour("purple");
+        
+        engine_room.setLocked();
+        engine_room.setColour("red");
+        //TODO: set currentRoom somewhere else, because now you get here each time the language is reset 
+        /*
+        if(roomHistory.size() >= 1){
+            currentRoom = roomHistory.get(roomHistory.size() - 1);
+        }
+          */
     }
     
     /**
@@ -144,17 +158,17 @@ public class Game
      * Creates all items and puts them in the appropriate rooms.
      */
     private void createItems(){             //.
-        branch = new Item(r.getString("item_branch_name"), r.getString("item_branch_description"), 3);
+        branch = new Item(r.getString("branch"), r.getString("item_branch_description"), 3);
         foyer.addItem(branch);
         
-        steroids = new Item(r.getString("item_steroids_name"), r.getString("item_steroids_description"), 1);
+        steroids = new Item(r.getString("steroids"), r.getString("item_steroids_description"), 1);
         foyer.addItem(steroids);
         
         purpleKey = new Item(r.getString("item_purpleKey_name"), r.getString("item_purpleKey_description"), 2);
-        foyer.addItem(purpleKey);
+        reading_room.addItem(purpleKey);
         
         redKey = new Item(r.getString("item_redKey_name"), r.getString("item_redKey_description"), 2);
-        foyer.addItem(redKey);
+        front_yard.addItem(redKey);
         
         blueKey = new Item(r.getString("item_blueKey_name"), r.getString("item_blueKey_description"), 2);
         foyer.addItem(blueKey);
@@ -192,11 +206,11 @@ public class Game
                 display.buttonPanel.setVisible(true);
                 break;
             case 2:
-                
+                display.languagePanel.setVisible(false);
                 display.buttonPanel.setVisible(false);
                 display.inputPanel.setVisible(true);
                 display.mainText.setVisible(true);
-                printWelcome();
+                
                 break;
             case 3:
                 //show options
@@ -210,7 +224,9 @@ public class Game
      */
     public void play() 
     {           
-        
+          // start game in foyer.
+        currentRoom = foyer;  
+        roomHistory.add(currentRoom);
         printWelcome();
     }
     
@@ -219,7 +235,6 @@ public class Game
      */
     public void printWelcome()
     {   
-        //display.mainTextArea.setText(r.getString("welcome") + "\n" + currentRoom.getLongDescription());
         typeWriter.type(r.getString("welcome") + "\n\n" + currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());
     }
 
@@ -252,6 +267,7 @@ public class Game
                 break;
             
             case BACK:
+                System.out.println("going back");//.
                 goBack();
                 break;
             
@@ -259,7 +275,8 @@ public class Game
                 look();
                 break;
                 
-            case TAKE:                  //.
+            case TAKE: 
+                System.out.println("taking");//.
                 takeItem(command);
                 break;
                 
@@ -267,7 +284,8 @@ public class Game
                 printInventory();
                 break;
                     
-            case DROP:                  //.
+            case DROP:
+                System.out.println("dropping");//.
                 dropItem(command);
                 break;
                 
@@ -327,12 +345,13 @@ public class Game
             return;
         }
 
-        String itemToTake = command.getSecondWord();
+        CommandWord itemToTake = command.getSecondWord();
+        //String itemToTake = command.getSecondWord();
         int totalWeight = calculateWeight();
         
         switch(itemToTake)
         {
-            case "branch":
+            case BRANCH:
             // TODO: switchen op constants that are set in the resource bundles.
                 if(totalWeight + branch.getWeight() <= weightCapacity){
                     if(currentRoom.inventoryContains(branch)){
@@ -348,7 +367,7 @@ public class Game
                 }
                 break;
                 
-            case "steroids":
+            case STEROIDS:
                 if(totalWeight + steroids.getWeight() <= weightCapacity){
                     if(currentRoom.inventoryContains(steroids)){
                         playerInventory.add(steroids);
@@ -363,7 +382,7 @@ public class Game
                 }
                 break;
                 
-            case "key":
+            case KEY:
                 if(totalWeight + purpleKey.getWeight() <= weightCapacity){
                     if(currentRoom.inventoryContains(purpleKey)){
                         playerInventory.add(purpleKey);
@@ -381,7 +400,7 @@ public class Game
                         typeWriter.type(r.getString("item_key_null"));
                     }
                 } else {
-                    typeWriter.type(r.getString("item_too heavy"));
+                    typeWriter.type(r.getString("item_too_heavy"));
                     typeWriter.type(r.getString("remove_x_weight")  + purpleKey.getWeight());
                 }
                 break;
@@ -396,16 +415,11 @@ public class Game
      * Drops the stated item on the floor
      */
     private void dropItem(Command command){
-        if(!command.hasSecondWord()){
-            typeWriter.type(r.getString("drop_what"));
-            return;
-        }
-        
-        String itemToDrop = command.getSecondWord();
+        CommandWord itemToDrop = command.getSecondWord();
         
         switch(itemToDrop)
         {
-            case "branch":
+            case BRANCH:
             //TODO: ook dit kan via ints net als bij take.
                 if(playerInventory.contains(branch)){
                     currentRoom.addItem(branch);
@@ -415,9 +429,9 @@ public class Game
                     typeWriter.type(r.getString("drop_null_item"));
                 }
                 break;
-                
+            //TODO cases toevoegen voor elk item
             default:
-                typeWriter.type(r.getString("unknown"));
+                typeWriter.type(r.getString("drop_what")); //TODO i can't drop that 
                 break;
         }
     }
@@ -431,11 +445,11 @@ public class Game
             return;
         }
         
-        String itemToUse = command.getSecondWord();
+        CommandWord itemToUse = command.getSecondWord();
         
         switch(itemToUse)
         {
-            case "steroids":
+            case STEROIDS:
                 if(playerInventory.contains(steroids)){
                     weightCapacity = 30;
                     playerInventory.remove(steroids);
@@ -460,7 +474,9 @@ public class Game
             return;
         }
 
-        String direction = command.getSecondWord();
+        String direction = command.getSecondString();
+        
+        //System.out.println(direction.toString());
          // Try to leave current room.
         Room nextRoom = currentRoom.getExit(direction);
         
@@ -541,15 +557,18 @@ public class Game
         {
             if(display.startButton.equals(event.getSource())){
               showScreen(2);
+              play();
             }
             else if (display.language1.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", english);
                 createRooms();
+                createItems();
                 CommandWords.resetEnum(english);
             }
             else if (display.language2.equals(event.getSource())){
                 r = ResourceBundle.getBundle("Bundle", deutsch);
                 createRooms();
+                createItems();
                 CommandWords.resetEnum(deutsch);
             }
             else if (display.confirmInputButton.equals(event.getSource())){
