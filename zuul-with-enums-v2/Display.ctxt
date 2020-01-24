@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=Display
-comment0.text=\n\ The\ Display\ class\ provides\ methods\ for\ creating\ the\ graphical\ user\ interface\n\n\ @author\ (your\ name)\n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment0.text=\n\ The\ Display\ class\ provides\ methods\ for\ creating\ the\ graphical\ user\ interface\n\n\ @author\ Pjotr\ F.W.\ Kooijmans\ \n\ @version\ 2020.01.23\n
 comment1.params=x\ y\ title\ background\ foreground
 comment1.target=Display(int,\ int,\ java.lang.String,\ java.awt.Color,\ java.awt.Color)
 comment1.text=\n\ Constructor\ for\ objects\ of\ class\ Display\n

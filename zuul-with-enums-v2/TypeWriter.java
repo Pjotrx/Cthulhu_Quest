@@ -3,8 +3,8 @@ import java.util.TimerTask;
 /**
  * Write a description of class TypeWriter here.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Pjotr F.W. Kooijmans 
+ * @version 2020.01.15
  */
 public class TypeWriter
 {

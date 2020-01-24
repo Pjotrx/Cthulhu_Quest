@@ -7,8 +7,8 @@ import java.net.URL;
 /**
  * The Display class provides methods for creating the graphical user interface
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author Pjotr F.W. Kooijmans 
+ * @version 2020.01.23
  */
 public class Display
 {

@@ -1,18 +1,15 @@
 /**
- *  This class is the main class of the "World of Zuul" application. 
- *  "World of Zuul" is a very simple, text based adventure game.  Users 
- *  can walk around some scenery. That's all. It should really be extended 
- *  to make it more interesting!
- * 
+ *  This class is the main class of the "Cthulhu Quest" application. 
+ *  "Cthulhu Quest" is a very simple, text based adventure game.
  *  To play this game, create an instance of this class and call the "play"
  *  method.
  * 
  *  This main class creates and initialises all the others: it creates all
- *  rooms, creates the parser and starts the game.  It also evaluates and
+ *  rooms, creates the parser, the display, the tyepwriter and starts the game.  It also evaluates and
  *  executes the commands that the parser returns.
  * 
- * @author  Michael Kölling and David J. Barnes
- * @version 2016.02.29
+ * @author  Sjoerd Jr Helmhout and Pjotr F.W. Kooijmans 
+ * @version 2020.01.24
  */
 
 import java.awt.Color;
@@ -22,7 +19,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -45,6 +41,7 @@ public class Game
     
     public static Display display;
     public static TypeWriter typeWriter;
+
     
     private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
     private Room foyer, hallway, reading_room, woods, congierge_office, engine_room, long_hall, long_hall_north, front_yard, dungeon, fainting_room, tabagie, frigidarium, cry_room, servant_hall, psychomantium, aerary;       //. As stated below at createRooms, the rooms were moved for easier access to them.
@@ -77,22 +74,22 @@ public class Game
     }
     
     /**
+     * Constructor for objects of class Game.
      * Create the game and initialise its internal map.
      */
     public Game() 
-    {
-        
+    {        
         createRooms();
         parser = new Parser();
         createDisplay();
         
         createInventory();      //.
         
-        weightCapacity = 10;    //. This is how much a player can carry in total.
+        weightCapacity = 1;    //. This is how much a player can carry in total.
         
         typeWriter = new TypeWriter(0, 1);
-        typeWriter.start();
-        createItems();          //.
+        typeWriter.start();        
+        createItems();  
     }
     
     
@@ -100,9 +97,7 @@ public class Game
      * Create all the rooms and link their exits together.
      */
     private void createRooms()
-    {
-        
-      
+    {              
         // create the rooms
         foyer = new Room(r.getString("foyer"));
         hallway = new Room(r.getString("hallway"));
@@ -184,9 +179,11 @@ public class Game
         dungeon.setLocked();
         dungeon.setColour("blue");
         
+        //create amnesia in the appropriate rooms at the start of the game.
         cry_room.setAmnesia();
         woods.setAmnesia();
         
+        //trap the appropriate rooms at the start of the game.
         long_hall_north.setTrapped();
         
     }
@@ -268,8 +265,7 @@ public class Game
                 display.languagePanel.setVisible(false);
                 display.buttonPanel.setVisible(false);
                 display.inputPanel.setVisible(true);
-                display.mainText.setVisible(true);
-                
+                display.mainText.setVisible(true);            
                 break;
             case 3:
                 display.inputPanel.setVisible(false);
@@ -293,9 +289,8 @@ public class Game
      *  Instead of a loop event triggers are used.
      */
     public void play() 
-    {           
-          // start game in foyer.
-        currentRoom = foyer;  
+    {                     
+        currentRoom = foyer;  // start game in foyer.
         roomHistory.add(currentRoom);
         printWelcome();
     }
@@ -336,8 +331,7 @@ public class Game
                 wantToQuit = quit(command);
                 break;
             
-            case BACK:
-                System.out.println("going back");//.
+            case BACK:                
                 goBack();
                 break;
             
@@ -346,7 +340,6 @@ public class Game
                 break;
                 
             case TAKE: 
-                System.out.println("taking");//.
                 takeItem(command);
                 break;
                 
@@ -355,7 +348,6 @@ public class Game
                 break;
                     
             case DROP:
-                System.out.println("dropping");//.
                 dropItem(command);
                 break;
                 
@@ -415,8 +407,7 @@ public class Game
             return;
         }
 
-        CommandWord itemToTake = command.getSecondWord();
-        //String itemToTake = command.getSecondWord();
+        CommandWord itemToTake = command.getSecondWord();       
         int totalWeight = calculateWeight();
         
         switch(itemToTake)
@@ -519,8 +510,7 @@ public class Game
         
         switch(itemToDrop)
         {
-            case BRANCH:
-            //TODO: ook dit kan via ints net als bij take.
+            case BRANCH:           
                 if(playerInventory.contains(branch)){
                     currentRoom.addItem(branch);
                     playerInventory.remove(branch);
@@ -531,7 +521,7 @@ public class Game
                 break;
             //TODO cases toevoegen voor elk item
             default:
-                typeWriter.type(r.getString("drop_what")); //TODO i can't drop that 
+                typeWriter.type(r.getString("drop_what")); 
                 break;
         }
     }
@@ -567,7 +557,7 @@ public class Game
                 }
                 break;
                 
-                case POTION:
+            case POTION:
                 if(playerInventory.contains(potion)){
                     weightCapacity = 1;
                     playerInventory.remove(potion);
@@ -582,8 +572,8 @@ public class Game
     }
     
     /** 
-     * Try to go in one direction. If there is an exit, enter the new
-     * room, otherwise print an error message.
+     * Try to go in one direction, if there is an exit, check for lock and key. Then enter the new
+     * room. Also checks if you are in the final room.
      */
     private void goRoom(Command command) 
     {
@@ -595,7 +585,6 @@ public class Game
 
         String direction = command.getSecondString();
         
-        //System.out.println(direction.toString());
          // Try to leave current room.
         Room nextRoom = currentRoom.getExit(direction);
         
@@ -673,21 +662,15 @@ public class Game
     }
     
     /** 
-     * "Quit" was entered. Check the rest of the command to see
-     * whether we really quit the game.
-     * @return true, if this command quits the game, false otherwise.
+     * "Quit" was entered. Show a screen with the quit and continue button.
+     * If continue is pressed you return to the game
+     * If quit is pressed the program is ended.
      */
     private boolean quit(Command command) 
     {
-        /*if(command.hasSecondWord()) {
-            typeWriter.type(r.getString("quitWhat"));
-            return false;
-        } */
-       // else {
             typeWriter.type(r.getString("quit"));
             showScreen(4);
             return true;  // signal that we want to quit
-        //}
     }
          
     /**
@@ -721,7 +704,6 @@ public class Game
             }
             else if (display.confirmInputButton.equals(event.getSource())){
                 getValue = display.userInput.getText();
-                //System.out.println(getValue);   //just for debugging
                 display.userInput.setText("");
                 
                 boolean finished = false;                 
@@ -734,9 +716,7 @@ public class Game
             }
             else if (display.quitButton.equals(event.getSource())){
                 System.exit(0);
-            }
-            
-            
+            }                       
         }
     }
         

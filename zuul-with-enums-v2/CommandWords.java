@@ -25,7 +25,7 @@ public class CommandWords
         for(CommandWord command : CommandWord.values()) {
             if(command != CommandWord.UNKNOWN) {
                 validCommands.put(command.toString(), command);
-                System.out.println(command.toString());
+                //System.out.println(command.toString());
             }
         }
     }

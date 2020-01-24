@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.target=TypeWriter
-comment0.text=\n\ Write\ a\ description\ of\ class\ TypeWriter\ here.\n\n\ @author\ (your\ name)\n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment0.text=\n\ Write\ a\ description\ of\ class\ TypeWriter\ here.\n\n\ @author\ Pjotr\ F.W.\ Kooijmans\ \n\ @version\ 2020.01.15\n
 comment1.params=
 comment1.target=void\ run()
 comment2.params=
