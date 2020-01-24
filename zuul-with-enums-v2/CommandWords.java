@@ -71,7 +71,7 @@ public class CommandWords
     /**
      * Print all valid commands to System.out.
      */
-    public void showAll() 
+   /* public void showAll() 
     {
         for(String command : validCommands.keySet()) {
             System.out.print(command + "  ");
@@ -88,5 +88,5 @@ public class CommandWords
         }
         //System.out.println();
         return output.toString();
-    }
+    }*/
 }

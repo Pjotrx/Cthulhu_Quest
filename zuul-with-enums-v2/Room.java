@@ -22,7 +22,7 @@
     private String description;
     private HashMap<String, Room> exits;        // stores exits of this room.
     private ArrayList<Item> roomInventory;      // stores the items that are located in this room.
-    private boolean locked;                      // stores whether the room is locked or not at this stage.
+    private boolean locked, amnesia, trapped;                      // stores whether the room is locked or not at this stage
     private String colour;                       // stores which color key is needed.
     
     /**
@@ -37,6 +37,8 @@
         exits = new HashMap<>();
         roomInventory = new ArrayList<>();
         locked = false;                         //Every room starts unlocked. If you want one locked, use setLock.
+        trapped = false;
+        amnesia = false;
         colour = "";                            //Just like the lock, every room has no colour for the lock.
     }
 
@@ -130,6 +132,30 @@
     
     public boolean getLocked(){
         return locked;
+    }
+    
+    public void setAmnesia(){
+        amnesia = true;
+    }
+    
+    public void setUnAmnesia(){
+        amnesia = false;
+    }
+    
+    public boolean getAmnesia(){
+        return amnesia;
+    }
+    
+    public void setTrapped(){
+        trapped = true;
+    }
+    
+    public void setUnTrapped(){
+        trapped = false;
+    }
+    
+    public boolean getTrapped(){
+        return trapped;
     }
     
     public String getColour(){

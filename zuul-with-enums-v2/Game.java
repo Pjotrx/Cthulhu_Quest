@@ -22,6 +22,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,6 +34,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.ArrayList;
 
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 public class Game 
 {
     private Parser parser;
@@ -43,8 +47,8 @@ public class Game
     public static TypeWriter typeWriter;
     
     private ArrayList<Item> playerInventory;      //. Items are added in the take item command located below
-    private Room foyer, hallway, reading_room, congierge_office, engine_room, long_hall, front_yard;       //. As stated below at createRooms, the rooms were moved for easier access to them.
-    Item branch, steroids, purpleKey, redKey, blueKey;                                    //. Items are treated the same way as rooms.
+    private Room foyer, hallway, reading_room, woods, congierge_office, engine_room, long_hall, long_hall_north, front_yard, dungeon, fainting_room, tabagie, frigidarium, cry_room, servant_hall, psychomantium, aerary;       //. As stated below at createRooms, the rooms were moved for easier access to them.
+    Item branch, manual, steroids, purpleKey, redKey, blueKey, potion;                                    //. Items are treated the same way as rooms.
     private int weightCapacity;
     
     JFrame window;
@@ -64,6 +68,7 @@ public class Game
     static String getValue;
     TitleScreenHandler tsHandler = new TitleScreenHandler();
     ArrayList<Room> roomHistory = new ArrayList<Room>();
+    Random rand = new Random();
     
     
     
@@ -83,7 +88,7 @@ public class Game
         
         createInventory();      //.
         
-        weightCapacity = 1;    //. This is how much a player can carry in total.
+        weightCapacity = 10;    //. This is how much a player can carry in total.
         
         typeWriter = new TypeWriter(0, 1);
         typeWriter.start();
@@ -105,7 +110,17 @@ public class Game
         congierge_office = new Room(r.getString("congierge_office"));
         engine_room = new Room(r.getString("engine_room"));
         long_hall = new Room(r.getString("long_hall"));
+        long_hall_north = new Room(r.getString("long_hall_north"));
         front_yard = new Room(r.getString("front_yard"));
+        dungeon = new Room(r.getString("dungeon"));
+        fainting_room = new Room(r.getString("fainting_room"));
+        tabagie = new Room(r.getString("tabagie"));
+        frigidarium = new Room(r.getString("frigidarium"));
+        cry_room = new Room(r.getString("cry_room"));
+        servant_hall = new Room(r.getString("servant_hall"));
+        psychomantium = new Room(r.getString("psychomantium"));
+        aerary= new Room(r.getString("aerary"));
+        woods= new Room(r.getString("woods"));
         
         // initialise room exits
         foyer.setExit(r.getString("north"), hallway);
@@ -126,11 +141,37 @@ public class Game
         engine_room.setExit(r.getString("east"), congierge_office);
         
         long_hall.setExit(r.getString("south"), hallway);
+        long_hall.setExit(r.getString("north"), long_hall_north);
         
+        long_hall_north.setExit(r.getString("south"), long_hall);
+        long_hall_north.setExit(r.getString("north"), dungeon);
+        long_hall_north.setExit(r.getString("east"), fainting_room);
         
+        dungeon.setExit(r.getString("south"), long_hall_north);
         
+        tabagie.setExit(r.getString("east"), long_hall_north);
+        
+        fainting_room.setExit(r.getString("south"), frigidarium);
+        fainting_room.setExit(r.getString("west"), long_hall_north);
+        
+        frigidarium.setExit(r.getString("south"), woods);
+        frigidarium.setExit(r.getString("north"), fainting_room);
+        frigidarium.setExit(r.getString("east"), servant_hall);
+        frigidarium.setExit(r.getString("west"), cry_room);
+        
+        cry_room.setExit(r.getString("south"), reading_room);
+        cry_room.setExit(r.getString("east"), frigidarium);
 
+        servant_hall.setExit(r.getString("west"), frigidarium);
+        servant_hall.setExit(r.getString("east"), psychomantium);
+        servant_hall.setExit(r.getString("north"), aerary);
         
+        psychomantium.setExit(r.getString("west"), servant_hall);
+        
+        aerary.setExit(r.getString("south"), servant_hall);
+        
+        woods.setExit(r.getString("west"), front_yard);
+        woods.setExit(r.getString("north"), frigidarium);
 
         
         //lock the appropriate rooms at the start of the game.
@@ -139,12 +180,15 @@ public class Game
         
         engine_room.setLocked();
         engine_room.setColour("red");
-        //TODO: set currentRoom somewhere else, because now you get here each time the language is reset 
-        /*
-        if(roomHistory.size() >= 1){
-            currentRoom = roomHistory.get(roomHistory.size() - 1);
-        }
-          */
+        
+        dungeon.setLocked();
+        dungeon.setColour("blue");
+        
+        cry_room.setAmnesia();
+        woods.setAmnesia();
+        
+        long_hall_north.setTrapped();
+        
     }
     
     /**
@@ -161,8 +205,15 @@ public class Game
         branch = new Item(r.getString("branch"), r.getString("item_branch_description"), 3);
         foyer.addItem(branch);
         
+        manual = new Item(r.getString("manual"), r.getString("item_manual_description"), 1);
+        engine_room.addItem(manual);
+        
+        potion = new Item(r.getString("potion"), r.getString("item_potion_description"), 1);
+        fainting_room.addItem(potion);
+        
         steroids = new Item(r.getString("steroids"), r.getString("item_steroids_description"), 1);
         foyer.addItem(steroids);
+        aerary.addItem(steroids);
         
         purpleKey = new Item(r.getString("item_purpleKey_name"), r.getString("item_purpleKey_description"), 2);
         reading_room.addItem(purpleKey);
@@ -171,7 +222,7 @@ public class Game
         front_yard.addItem(redKey);
         
         blueKey = new Item(r.getString("item_blueKey_name"), r.getString("item_blueKey_description"), 2);
-        foyer.addItem(blueKey);
+        tabagie.addItem(blueKey);
     }
     
     /**
@@ -184,7 +235,12 @@ public class Game
         display.setLanguagePanel(10, 10, 50, 100, Color.black);
         display.setMainTextPanel(100,100,600,300,Color.black);
         display.setMainTextArea(100,100,600,300,"test",Color.black,Color.white);
-        display.addButtons(tsHandler, "start", "↵", "En", "De", "back", Color.black, Color.white);
+        display.setTitlePanel(100,0,600,100,Color.black);
+        display.setTitleLabel("C̶͉͉͆̈ẗ̶͓̤̓̐̚͝ẖ̴̀͝u̴͌̆̄ͅl̵̢̡̒h̷̢̛̛͔̀̈́͠ǘ̷̢̨͚͍́̈͊̆ ̷̬̓͗́̇Q̴̗̰̖͈̟͊͝û̷͔̝̗̫͗͝͝è̵̺s̶̰͒̀̔ṭ̴̡̞̝͊");
+        display.setImagePanel(200,100,400,250,Color.black);
+        display.setTitleTextArea(100,100,350,300,r.getString("cthulhu"),Color.black,Color.white);
+        
+        display.addButtons(tsHandler, r.getString("start"), r.getString("quit"), r.getString("continue"), "↵", Color.black, Color.white);
         
         showScreen(1);
         display.window.setVisible(true);
@@ -204,8 +260,11 @@ public class Game
                 display.inputPanel.setVisible(false);
                 display.mainText.setVisible(false);
                 display.buttonPanel.setVisible(true);
+                display.continueButton.setVisible(false);
                 break;
             case 2:
+                display.imagePanel.setVisible(false);
+                display.titlePanel.setVisible(false);
                 display.languagePanel.setVisible(false);
                 display.buttonPanel.setVisible(false);
                 display.inputPanel.setVisible(true);
@@ -213,7 +272,18 @@ public class Game
                 
                 break;
             case 3:
-                //show options
+                display.inputPanel.setVisible(false);
+                display.buttonPanel.setVisible(true);
+                display.startButton.setVisible(false);
+                display.continueButton.setVisible(false);
+                break;
+            case 4:
+                display.mainText.setVisible(false);
+                display.inputPanel.setVisible(false);
+                display.imagePanel.setVisible(true);
+                display.buttonPanel.setVisible(true);
+                display.startButton.setVisible(false);
+                display.continueButton.setVisible(true);
                 break;
         }
     }
@@ -303,7 +373,7 @@ public class Game
      */
     private void printHelp() 
     {
-        typeWriter.type(r.getString("helpText") + parser.showCommands());
+        typeWriter.type(r.getString("helpText") + r.getString("commandWords"));
     }
 
     /**
@@ -377,8 +447,38 @@ public class Game
                         typeWriter.type(r.getString("item_steroids_null"));
                     }
                 } else {
-                    typeWriter.type(r.getString("item_too heavy"));
+                    typeWriter.type(r.getString("item_too_heavy"));
                     typeWriter.type(r.getString("remove_x_weight")  + steroids.getWeight());
+                }
+                break;
+                
+            case MANUAL:
+                if(totalWeight + manual.getWeight() <= weightCapacity){
+                    if(currentRoom.inventoryContains(manual)){
+                        playerInventory.add(manual);
+                        currentRoom.removeItem(manual);
+                        typeWriter.type(r.getString("taken_item_manual"));
+                    } else {
+                        typeWriter.type(r.getString("item_manual_null"));
+                    }
+                } else {
+                    typeWriter.type(r.getString("item_too_heavy"));
+                    typeWriter.type(r.getString("remove_x_weight")  + manual.getWeight());
+                }
+                break;
+                
+            case POTION:
+                if(totalWeight + potion.getWeight() <= weightCapacity){
+                    if(currentRoom.inventoryContains(potion)){
+                        playerInventory.add(potion);
+                        currentRoom.removeItem(potion);
+                        typeWriter.type(r.getString("taken_item_potion"));
+                    } else {
+                        typeWriter.type(r.getString("item_potion_null"));
+                    }
+                } else {
+                    typeWriter.type(r.getString("item_too_heavy"));
+                    typeWriter.type(r.getString("remove_x_weight")  + manual.getWeight());
                 }
                 break;
                 
@@ -456,6 +556,25 @@ public class Game
                     typeWriter.type(r.getString("used_item_steroids"));
                 }
                 break;
+            case MANUAL:
+                if(playerInventory.contains(manual) && currentRoom == engine_room){
+                    weightCapacity = 30;
+                    playerInventory.remove(manual);
+                    long_hall_north.setUnTrapped();
+                    typeWriter.type(r.getString("used_item_manual"));
+                }else{
+                    typeWriter.type(r.getString("use_manual_later"));
+                }
+                break;
+                
+                case POTION:
+                if(playerInventory.contains(potion)){
+                    weightCapacity = 1;
+                    playerInventory.remove(potion);
+                    long_hall_north.setExit(r.getString("west"), tabagie);
+                    typeWriter.type(r.getString("used_item_potion"));
+                }
+                break;
             
             default:
                 typeWriter.type(r.getString("unknown"));
@@ -483,6 +602,7 @@ public class Game
         //..
         if (nextRoom == null) {
             display.mainTextArea.append("\n" + r.getString("noDoor"));
+           
         } else {
             if(nextRoom.getLocked()){
                 String colour = nextRoom.getColour();
@@ -501,10 +621,22 @@ public class Game
                 } else {
                     typeWriter.type(r.getString("no_key"));
                 }
-            } else {
+            } else if(nextRoom.getTrapped()){
+               trapTeleport();
+            } 
+            else {
+                if(currentRoom.getAmnesia()){
+                    roomHistory.clear();
+                }
                 currentRoom = nextRoom;
-                roomHistory.add(currentRoom);
-                typeWriter.type(currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());         
+                
+                    roomHistory.add(currentRoom);
+                    typeWriter.type(currentRoom.getShortDescription() + "\n\n" + currentRoom.getExitString());
+                if(currentRoom == dungeon){
+                    showScreen(3);
+                    typeWriter.type(r.getString("end"));
+                }
+                         
             }   
         }
     }
@@ -523,6 +655,15 @@ public class Game
         }
     }
     
+    private void trapTeleport(){
+        System.out.println("it's a trap!");
+        int n = rand.nextInt(roomHistory.size());
+        //display.mainTextArea.setText(r.getString("cthulhu"));        
+        display.mainTextArea.setText(r.getString("cthulhu"));
+        currentRoom = roomHistory.get(n);
+        typeWriter.type(r.getString("trapped")); 
+    }
+    
     
     /**
      * Sets the textArea to a description of the current room.
@@ -538,14 +679,15 @@ public class Game
      */
     private boolean quit(Command command) 
     {
-        if(command.hasSecondWord()) {
+        /*if(command.hasSecondWord()) {
             typeWriter.type(r.getString("quitWhat"));
             return false;
-        }
-        else {
+        } */
+       // else {
             typeWriter.type(r.getString("quit"));
+            showScreen(4);
             return true;  // signal that we want to quit
-        }
+        //}
     }
          
     /**
@@ -571,6 +713,12 @@ public class Game
                 createItems();
                 CommandWords.resetEnum(deutsch);
             }
+            else if (display.language3.equals(event.getSource())){
+                r = ResourceBundle.getBundle("Bundle", nederlands);
+                createRooms();
+                createItems();
+                CommandWords.resetEnum(nederlands);
+            }
             else if (display.confirmInputButton.equals(event.getSource())){
                 getValue = display.userInput.getText();
                 //System.out.println(getValue);   //just for debugging
@@ -580,8 +728,12 @@ public class Game
                 Command command = parser.getCommand(getValue);
                 finished = processCommand(command);                
             }
-            else if (display.backButton.equals(event.getSource())){
-                showScreen(1);
+            else if (display.continueButton.equals(event.getSource())){
+                showScreen(2);
+                look();
+            }
+            else if (display.quitButton.equals(event.getSource())){
+                System.exit(0);
             }
             
             

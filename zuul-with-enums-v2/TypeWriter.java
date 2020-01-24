@@ -10,9 +10,11 @@ public class TypeWriter
 {
     // instance variables - replace the example below with your own
     private String string, string2;
-    int i, waitTime;
+    int i, waitTime, j;
     Timer myTimer;
     String str;
+    String[] glitch = {"", ""};
+    int duration;
     
     TimerTask task = new TimerTask(){
         public void run() {
@@ -24,6 +26,7 @@ public class TypeWriter
             i++;
         }
     };
+    
 
     public void start(){
         myTimer.schedule(task, 30, 30); 
@@ -37,6 +40,7 @@ public class TypeWriter
          this.string = "";
          this.i = i;
          this.waitTime = waitTime;
+         
     }
     
     public void type(String string){
@@ -44,6 +48,8 @@ public class TypeWriter
         this.string = string;
         str = "";
     }
+    
+   
 
     
 }

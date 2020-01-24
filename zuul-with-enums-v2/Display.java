@@ -13,10 +13,10 @@ import java.net.URL;
 public class Display
 {
    JFrame window;
-   JPanel  buttonPanel, titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
+   JPanel  imagePanel, buttonPanel, titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
    JLabel titleLabel;
-   JButton button, startButton, option1, option2, language1, language2, confirmInputButton, backButton;
-   JTextArea mainTextArea;
+   JButton quitButton, startButton, option1, option2, language1, language2, language3, confirmInputButton, continueButton;
+   JTextArea mainTextArea, titleTextArea;
    JTextField userInput;
    Container con;
    
@@ -28,9 +28,13 @@ public class Display
    URL en_flag_pressed = Game.class.getResource("images/en_flag_pressed.png");
    URL en_flag_hover = Game.class.getResource("images/en_flag_hover.png");
    
+   URL nl_flag = Game.class.getResource("images/nl_flag.png");
+   URL nl_flag_pressed = Game.class.getResource("images/nl_flag_pressed.png");
+   URL nl_flag_hover = Game.class.getResource("images/nl_flag_hover.png");
+   
    Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
-   Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
-   Font smallFont = new Font("Times New Roman", Font.PLAIN, 18);
+   Font normalFont = new Font(Font.MONOSPACED, Font.PLAIN, 18);
+   Font smallFont = new Font(Font.MONOSPACED, Font.PLAIN, 5);
     /**
      * Constructor for objects of class Display
      */
@@ -39,13 +43,17 @@ public class Display
       this.window.setSize(x, y);
       this.window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  //important to close the window properly
       this.window.getContentPane().setBackground(Color.black);
+      this.window.setResizable(false);
       this.window.setLayout(null); 
        
        
       this.titlePanel = new JPanel();
+      this.titleLabel = new JLabel();
+      this.imagePanel = new JPanel();
       this.buttonPanel = new JPanel();       
       this.mainText = new JPanel(); 
-      this.mainTextArea = new JTextArea();       
+      this.mainTextArea = new JTextArea(); 
+      this.titleTextArea = new JTextArea();
       this.inputPanel = new JPanel();       
       this.userInput = new JTextField("");       
       this.languagePanel = new JPanel();
@@ -54,6 +62,7 @@ public class Display
       con.add(mainText);
       
       con.add(titlePanel);
+      con.add(imagePanel);
       con.add(buttonPanel);
       con.add(languagePanel);
       con.add(buttonPanel);
@@ -64,12 +73,24 @@ public class Display
    /**
    * Create and add the buttons to the display
    */
-   public void addButtons(Game.TitleScreenHandler tsHandler, String start, String confirmInput, String languageString1, String languageString2, String back, Color background, Color foreground){
+   public void addButtons(Game.TitleScreenHandler tsHandler, String start, String quit, String back, String confirmInput, Color background, Color foreground){
        this.startButton = new JButton(start);
        this.startButton.setBackground(background);
        this.startButton.setForeground(foreground);
        this.startButton.setFont(normalFont);
        this.startButton.addActionListener(tsHandler);
+       
+       this.quitButton = new JButton(quit);
+       this.quitButton.setBackground(background);
+       this.quitButton.setForeground(foreground);
+       this.quitButton.setFont(normalFont);
+       this.quitButton.addActionListener(tsHandler);
+       
+       this.continueButton = new JButton(back);
+       this.continueButton.setBackground(background);
+       this.continueButton.setForeground(foreground);
+       this.continueButton.setFont(normalFont);
+       this.continueButton.addActionListener(tsHandler);
        
        this.confirmInputButton = new JButton(confirmInput);
        this.confirmInputButton.setBackground(background);
@@ -116,20 +137,38 @@ public class Display
        this.language2.setFont(normalFont);
        this.language2.addActionListener(tsHandler);
        
-       this.backButton = new JButton(back);
-       this.backButton.setBackground(background);
-       this.backButton.setForeground(foreground);
-       this.backButton.setFont(normalFont);
-       this.backButton.addActionListener(tsHandler);
+       
+       
+       this.language3 = new JButton();
+       if (ge_flag != null && ge_flag_pressed != null && ge_flag_hover != null) {
+           ImageIcon icon_nl = new ImageIcon(nl_flag);
+           ImageIcon icon_pressed_nl = new ImageIcon(nl_flag_pressed);
+           ImageIcon icon_hover_nl = new ImageIcon(nl_flag_hover);
+           language3.setIcon(icon_nl);
+           language3.setRolloverIcon(icon_hover_nl);
+           language3.setPressedIcon(icon_pressed_nl);
+        }
+        else{System.out.println("image not found");}
+        this.language3.setBorder(BorderFactory.createEmptyBorder());
+       this.language3.setContentAreaFilled(false);
+       this.language3.setBackground(background);
+       this.language3.setForeground(foreground);
+       this.language3.setFont(normalFont);
+       this.language3.addActionListener(tsHandler);
+       
+     
        
        
        
        languagePanel.add(language1);
        languagePanel.add(language2);
+       languagePanel.add(language3);
        //inputPanel.add(backButton);
        
        inputPanel.add(confirmInputButton,"East");
        buttonPanel.add(startButton);
+       buttonPanel.add(quitButton);
+       buttonPanel.add(continueButton);
    }
    
    
@@ -140,16 +179,48 @@ public class Display
         this.mainTextArea.setBackground(background);
         this.mainTextArea.setForeground(foreground);
         this.mainTextArea.setEditable(false);
-        this.mainTextArea.setFont(smallFont);
+        this.mainTextArea.setFont(normalFont);
         this.mainTextArea.setLineWrap(true);
         this.mainTextArea.setWrapStyleWord(true);
         
         this.mainText.add(mainTextArea);
     }
     
+    public void setTitleTextArea(int x, int y, int width, int height, String text, Color background, Color foreground){
+        this.titleTextArea = new JTextArea(text);
+        this.titleTextArea.setBounds(x, y, width, height);
+        this.titleTextArea.setBackground(background);
+        this.titleTextArea.setForeground(foreground);
+        this.titleTextArea.setEditable(false);
+        this.titleTextArea.setFont(smallFont);
+        this.titleTextArea.setLineWrap(true);
+        this.titleTextArea.setWrapStyleWord(true);
+        
+        this.imagePanel.add(titleTextArea);
+    }
+    
     public void setMainTextPanel(int x, int y, int width, int height, Color background){
         this.mainText.setBounds(x, y, width, height);
         this.mainText.setBackground(background);
+    }
+    
+    public void setTitleLabel(String title){
+        this.titleLabel.setText(title);
+        this.titleLabel.setForeground(Color.white);
+        this.titleLabel.setFont(titleFont);
+        this.titlePanel.add(titleLabel);
+    }
+    
+    public void setTitlePanel(int x, int y, int width, int height, Color background){
+        this.titlePanel.setBounds(x, y, width, height);
+        //this.titlePanel.setLayout(new GridLayout(2,0));
+        this.titlePanel.setBackground(background);
+    }
+    
+    public void setImagePanel(int x, int y, int width, int height, Color background){
+        this.imagePanel.setBounds(x, y, width, height);
+        //this.titlePanel.setLayout(new GridLayout(2,0));
+        this.imagePanel.setBackground(background);
     }
     
     public void setLanguagePanel(int x, int y, int width, int height, Color background){

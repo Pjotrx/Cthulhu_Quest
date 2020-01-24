@@ -47,9 +47,9 @@ public class Parser
     /**
      * Print out a list of valid command words.
      */
-    public String showCommands()
+   /* public String showCommands()
     {
         commands.showAll();        
         return commands.printAll();
-    }
+    }*/
 }
