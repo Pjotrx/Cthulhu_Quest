@@ -260,7 +260,7 @@ public class Game
                 display.continueButton.setVisible(false);
                 break;
             case 2:
-                display.imagePanel.setVisible(false);
+                //display.imagePanel.setVisible(false);
                 display.titlePanel.setVisible(false);
                 display.languagePanel.setVisible(false);
                 display.buttonPanel.setVisible(false);
