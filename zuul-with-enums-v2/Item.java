@@ -13,6 +13,7 @@ public class Item
 
     /**
      * Constructor for objects of class Item
+     * @param 
      */
     public Item(String newName, String newDescription, int newWeight)
     {

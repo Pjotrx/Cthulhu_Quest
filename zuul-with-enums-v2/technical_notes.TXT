@@ -1,0 +1,48 @@
+TypWriter class:
+    -used to set text in the MainTextArea char by char.
+    -uses a TimerTask to wait for a specified time before typing the next char.
+
+Display class:
+    -used to create the JFrame window in which the game is displayed
+    
+
+Language independence is achieved by using ResourceBundles.
+the default Locale is set to be english.
+By changing the Locale you change the ResourceBundle to retrieve the Strings from 
+
+Instead of a loop the game waits for input before processing the next command.
+
+Quikest path to the end:
+
+1.take steroids
+2.use steroids
+3.go north
+4.go  east
+5.take key
+6.back
+7.back
+8.go south
+9.go south
+10.take key
+11.go north
+12.go north
+13.go west 
+14.take manual
+15.go west
+16. go west
+17. use manual
+18. go east
+19. go east 
+20. go north
+21. go north
+22. go east
+23. take potion
+24. use potion
+25. take steroids
+26. use steroids
+27. go west
+28. go west
+29. take key
+30. go east
+31. go north
+32. go north

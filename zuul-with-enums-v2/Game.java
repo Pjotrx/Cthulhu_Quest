@@ -50,11 +50,9 @@ public class Game
     
     JFrame window;
     Container con;
-    JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
-    JLabel titleLabel;
-    Font titleFont = new Font("Times New Roman", Font.PLAIN, 50);
-    Font normalFont = new Font("Times New Roman", Font.PLAIN, 30);
-    Font smallFont = new Font("Times New Roman", Font.PLAIN, 12);
+    //JPanel titlePanel, startButtonPanel, mainText, optionPanel, languagePanel, inputPanel;
+    //JLabel titleLabel;
+
     JButton startButton, option1, option2, language1, language2, confirmInputButton;
     JTextArea mainTextArea;
     JTextField userInput;
@@ -203,13 +201,14 @@ public class Game
         foyer.addItem(branch);
         
         manual = new Item(r.getString("manual"), r.getString("item_manual_description"), 1);
-        engine_room.addItem(manual);
+        congierge_office.addItem(manual);
         
         potion = new Item(r.getString("potion"), r.getString("item_potion_description"), 1);
         fainting_room.addItem(potion);
         
         steroids = new Item(r.getString("steroids"), r.getString("item_steroids_description"), 1);
         foyer.addItem(steroids);
+        fainting_room.addItem(steroids);
         aerary.addItem(steroids);
         
         purpleKey = new Item(r.getString("item_purpleKey_name"), r.getString("item_purpleKey_description"), 2);
@@ -515,6 +514,36 @@ public class Game
                     currentRoom.addItem(branch);
                     playerInventory.remove(branch);
                     typeWriter.type(r.getString("item_branch_drop"));
+                } else {
+                    typeWriter.type(r.getString("drop_null_item"));
+                }
+                break;
+                
+            case STEROIDS:           
+                if(playerInventory.contains(steroids)){
+                    currentRoom.addItem(steroids);
+                    playerInventory.remove(steroids);
+                    typeWriter.type(r.getString("item_drop") + r.getString("steroids"));
+                } else {
+                    typeWriter.type(r.getString("drop_null_item"));
+                }
+                break;
+                
+            case MANUAL:           
+                if(playerInventory.contains(manual)){
+                    currentRoom.addItem(manual);
+                    playerInventory.remove(manual);
+                    typeWriter.type(r.getString("item_drop") + r.getString("manual"));
+                } else {
+                    typeWriter.type(r.getString("drop_null_item"));
+                }
+                break;
+                
+            case POTION:           
+                if(playerInventory.contains(potion)){
+                    currentRoom.addItem(potion);
+                    playerInventory.remove(potion);
+                    typeWriter.type(r.getString("item_drop") + r.getString("potion"));
                 } else {
                     typeWriter.type(r.getString("drop_null_item"));
                 }
